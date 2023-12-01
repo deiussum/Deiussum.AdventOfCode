@@ -8,57 +8,26 @@ const rl = readline.createInterface({
 });
 
 const replaceDigitWords = (line) => {
+    // Instead of replacing the text with the number, replace it with the number padded inside first/last letter of the 
+    // number word.  This will handle cases where you have things like oneight so that both numbers get inserted.
     const replacements = [
-        { value: 0, text: 'zero' },
-        { value: 1, text: 'one' },
-        { value: 2, text: 'two' }, 
-        { value: 3, text: 'three' },
-        { value: 4, text: 'four' },
-        { value: 5, text: 'five' },
-        { value: 6, text: 'six' },
-        { value: 7, text: 'seven' },
-        { value: 8, text: 'eight' },
-        { value: 9, text: 'nine' }
+        { text: 'zero', replacement: 'z0o' },
+        { text: 'one', replacement: 'o1e' },
+        { text: 'two', replacement: 't2o' }, 
+        { text: 'three', replacement: 't3e' },
+        { text: 'four', replacement: 'f4r' },
+        { text: 'five', replacement: 'f5e' },
+        { text: 'six', replacement: 's6x' },
+        { text: 'seven', replacement: 's7n' },
+        { text: 'eight', replacement: 'e8t' },
+        { text: 'nine', replacement: 'n9e' }
     ];
 
-    let replacementsFound = [];
-    replacements.forEach((replacement) => {
-        let keepLooking = true;
-
-        let nextIndex = 0;
-        while(keepLooking) {
-            const index = line.indexOf(replacement.text, nextIndex);
-
-            if (index >=0) {
-                replacementsFound.push({ ...replacement, index: index });
-                nextIndex = index + 1;
-            }
-            else {
-                keepLooking = false;
-            }
-        }
-    });
-
-    let firstReplacement = null;
-    let lastReplacement = null;
-
-    replacementsFound.forEach((replacement) => {
-        if (!firstReplacement || replacement.index < firstReplacement.index) firstReplacement = replacement;
-        if (!lastReplacement || replacement.index > lastReplacement.index) lastReplacement = replacement;
-    });
-
     let newLine = line;
-    if (lastReplacement) {
-        newLine = newLine.slice(0, lastReplacement.index) 
-            + lastReplacement.value 
-            + newLine.slice(lastReplacement.index);
-    }
-
-    if (firstReplacement) {
-        newLine = newLine.slice(0, firstReplacement.index) 
-            + firstReplacement.value 
-            + newLine.slice(firstReplacement.index);
-    }
+    replacements.forEach((replacement) => {
+        const regEx = new RegExp(replacement.text, 'g');
+        newLine = newLine.replace(regEx, replacement.replacement)
+    });
 
     return newLine;
 }
