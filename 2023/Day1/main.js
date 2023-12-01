@@ -37,22 +37,12 @@ const getDigits = (line) => {
     return newLine.replace(/\D/g,'');
 }
 
-const getFirstDigit = (line) => {
-    const digits = getDigits(line);
-    return digits.slice(0, 1);
-};
-
-const getLastDigit = (line) => {
-    const digits = getDigits(line);
-    return digits.slice(-1);
-}
-
 let total = 0;
-
 rl.on('line', function(line) {
     //console.log(line);
-    const firstDigit = getFirstDigit(line);
-    const lastDigit = getLastDigit(line);
+    const digits = getDigits(line);
+    const firstDigit = digits.slice(0, 1);
+    const lastDigit = digits.slice(-1);
 
     const lineVal = Number(`${firstDigit}${lastDigit}`);
     console.log(`${lineVal} - ${line}`);
