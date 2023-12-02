@@ -1,4 +1,4 @@
-const readfile = require('./readfile');
+const readfile = require('../../common/node/readfile');
 
 const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
