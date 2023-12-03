@@ -7,7 +7,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Day 1",
+            "name": "2023 - Day 1",
             "skipFiles": [
                 "<node_internals>/**"
             ],
@@ -17,7 +17,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Day 2",
+            "name": "2023 - Day 2",
             "skipFiles": [
                 "<node_internals>/**"
             ],
@@ -27,12 +27,232 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Day 3",
+            "name": "2023 - Day 3",
             "skipFiles": [
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}\\2023\\03\\main.js",
             "cwd": "${workspaceFolder}\\2023\\03"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 4",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\04\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\04"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 5",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\05\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\05"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 6",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\06\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\06"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 7",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\07\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\07"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 8",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\08\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\08"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 9",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\09\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\09"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 10",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\10\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\10"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 11",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\11\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\11"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 12",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\12\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\12"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 13",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\13\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\13"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 14",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\14\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\14"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 15",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\15\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\15"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 16",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\16\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\16"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 17",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\17\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\17"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 18",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\18\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\18"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 19",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\19\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\19"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 20",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\20\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\20"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 21",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\21\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\21"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 22",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\22\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\22"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 23",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\23\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\23"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 24",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\24\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\24"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "2023 - Day 25",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\2023\\25\\main.js",
+            "cwd": "${workspaceFolder}\\2023\\25"
         }
     ]
 }
