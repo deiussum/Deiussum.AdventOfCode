@@ -6,24 +6,43 @@ const INPUT = 'input.txt';
 readfile.readfile(INPUT, (lines) => {
     if (lines.length === 0) console.log('No input to process');
 
-    let total = 0;
+    let totalScore = 0;
+    const cards = []
     lines.forEach((line) => {
         const card = new Card(line);
         const score = card.getScore();
         const cardNumber = card.getCardNumber();
 
-        total += score;
+        totalScore += score;
+
+        cards.push(card);
 
         console.log(`Card: ${cardNumber}, Score: ${score}`)
     });
 
-    console.log(`Total score: ${total}`)
+    let totalCards = 0;
+    cards.forEach((card, index) => {
+        const matches = card.getMatchingNumbers();
+        const matchCount = matches.length;
+        const instanceCount = card.getInstancCount();
+
+        totalCards += instanceCount;
+
+        for(let i = 1; i <= matchCount; i++) {
+            if (index + i > cards.length) return;
+            cards[index + i].incrementInstance(instanceCount);
+        }
+    });
+
+    console.log(`Total score: ${totalScore}`);
+    console.log(`Total cards: ${totalCards}`);
 });
 
 class Card {
     #cardNumber = null;
     #winningNumbers = [];
     #playedNumbers = [];
+    #instanceCount = 1;
 
     constructor(line) {
         this.#parseCardNumber(line);
@@ -32,6 +51,7 @@ class Card {
     }
 
     getCardNumber() { return this.#cardNumber; }
+    getInstancCount() { return this.#instanceCount; }
 
     getMatchingNumbers() {
         return this.#winningNumbers.filter((num) => this.#playedNumbers.indexOf(num) >= 0);
@@ -40,6 +60,10 @@ class Card {
     getScore() {
         const matches = this.getMatchingNumbers();
         return matches.length === 0 ? 0 : 2 ** (matches.length - 1);
+    }
+
+    incrementInstance(incrementAmount) {
+        this.#instanceCount += incrementAmount;
     }
 
     #parseCardNumber(line) {
