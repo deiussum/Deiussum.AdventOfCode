@@ -8,6 +8,9 @@ readfile.readfile(INPUT, (lines) => {
 
     const times = [];
     const distances = [];
+    let part2Time = 0;
+    let part2Distance = 0;
+    
     lines.forEach((line) => {
         const labelSplit = line.split(':');
         if (labelSplit.length !== 2) return;
@@ -15,8 +18,14 @@ readfile.readfile(INPUT, (lines) => {
         const label = labelSplit[0];
         const numbers = parseNumbersToList(labelSplit[1]);
 
-        if (label === "Time") times.push(...numbers);
-        if (label === "Distance") distances.push(...numbers);
+        if (label === "Time") {
+            times.push(...numbers);
+            part2Time = parseStringToNumber(labelSplit[1]);
+        } 
+        if (label === "Distance") { 
+            distances.push(...numbers); 
+            part2Distance = parseStringToNumber(labelSplit[1]);
+        }
     });
 
     let part1Total = 1;
@@ -29,6 +38,9 @@ readfile.readfile(INPUT, (lines) => {
     }
 
     console.log(`Part 1 1otal is ${part1Total}`)
+
+    const part2WaysToWin = getWaysToWin(part2Time, part2Distance);
+    console.log(`Part 2 ways to win is ${part2WaysToWin}`);
 });
 
 const parseNumbersToList = (numberString) => {
@@ -42,6 +54,12 @@ const parseNumbersToList = (numberString) => {
     });
 
     return numbers;
+}
+
+const parseStringToNumber = (numberString) =>  {
+    const regex = / */g;
+    const strippedNumberString = numberString.replace(regex, '');
+    return Number(strippedNumberString);
 }
 
 const getWaysToWin = (time, distance) => {
