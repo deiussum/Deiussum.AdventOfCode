@@ -17,15 +17,23 @@ readfile.readfile(INPUT, (lines) => {
         nodeMap.addNode(line);
     });
 
-     const path1 = nodeMap.getPath(instructions);
-     console.log(`Path length: ${path1.length}`);
+    const path1 = nodeMap.getPath(instructions);
+    console.log(`Path length: ${path1.length}`);
 
+    const startTime = new Date();
+    console.log(`Started at ${startTime}`);
+    // This solution takes way too long. I ran it for around 12 hours and it barely broke 
+    // 250 million.  The answer is around 7 trillion, so I gave up on it. :)
     //const path2Size = nodeMap.getGhostPath(instructions);
+
     // There is no logical reason this should have worked, but it does.  It only works because
-    // the puzzle is setup so that the distance to the first end node is the same as the distance
-    // the end node is from itself while following the instructions.
+    // the puzzle is setup so each of the paths has a recurring pattern between the start and
+    // end nodes and you need to find the lowest common multiple.  
     const path2Size = nodeMap.getPart2PathLcm(instructions);
     console.log(`Path length part 2: ${path2Size}`);
+    const endTime = new Date();
+    const timeSpent = endTime - startTime;
+    console.log(`Finished at ${endTime}.  ${timeSpent}ms`);
 });
 
 class Node {
@@ -96,7 +104,17 @@ class NodeMap {
 
         console.log(distances);
 
-        return this.#getLcm(distances);
+        let lcm = 0;
+        distances.forEach((distance) => {
+            if (lcm === 0) {
+                lcm = distance;
+            }
+            else {
+                lcm = this.#getLcm(lcm, distance);
+            }
+        });
+
+        return lcm; 
     }
 
     getGhostPath(instructions) {
@@ -113,21 +131,14 @@ class NodeMap {
         return pathCount;
     }
 
-    #getLcm(numbers) {
-        let maxN = 0;
-
-        numbers.forEach((n) => {
-            if (n > maxN) maxN = n;
-        });
+    #getLcm(number1, number2) {
+        let maxN = Math.max(number1, number2);
 
         let multiplier = 1;
         let testLcm = maxN * multiplier;
         let keepLooking = true;
         while(keepLooking) {
-            let found = true;
-            numbers.forEach((n) => {
-                if (testLcm % n !== 0) found = false;
-            });
+            let found = testLcm % number1 === 0 && testLcm % number2 === 0;
 
             keepLooking = !found;
 
@@ -163,7 +174,7 @@ class NodeMap {
         const newNodes = [];
 
         nodes.forEach((node) => {
-            newNodes.push(this.#getNextNode(node));
+            newNodes.push(this.#getNextNode(instruction, node));
         });
 
         return newNodes;
