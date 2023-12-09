@@ -9,16 +9,21 @@ readfile.readfile(INPUT, (lines) => {
 
     const sequences = [];
     let part1Total = 0;
+    let part2Total = 0;
     lines.forEach((line) => {
         const sequence = new Sequence(line);
         sequences.push(sequence);
         const nextSequence = sequence.getNextValue();
         part1Total += nextSequence;
 
-        console.log(`${line} => ${nextSequence}`);
+        const prevSequence = sequence.getPrevValue();
+        part2Total += prevSequence
+
+        console.log(`${prevSequence} <= ${line} => ${nextSequence}`);
     });
 
     console.log(`Part 1 total is ${part1Total}`);
+    console.log(`Part 2 total is ${part2Total}`);
 
     const endTime = new Date();
     const elapsed = endTime - startTime;
@@ -58,6 +63,27 @@ class Sequence
         }
 
         return nextValue;
+    }
+
+    getPrevValue() {
+        const sequences = [];
+
+        let sequence = this.#numbers;
+        while(!this.#areAllZero(sequence)) {
+            sequences.push(sequence);
+            sequence = this.#getNextSequence(sequence);
+        }
+
+        let prevValue = 0;
+
+        for (let i = sequences.length - 1; i >= 0; i--)  {
+            const currentSequence = sequences[i];
+            const firstNumber = currentSequence[0];
+
+            prevValue = firstNumber - prevValue;
+        }
+
+        return prevValue;
     }
 
     #getNextSequence(numbers) {
