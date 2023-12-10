@@ -1,6 +1,7 @@
 const readfile = require('../../common/node/readfile');
 
 const TEST_INPUT = 'input-test.txt';
+const TEST_INPUT2 = 'input-test2.txt';
 const INPUT = 'input.txt';
 
 readfile.readfile(INPUT, (lines) => {
@@ -15,7 +16,8 @@ readfile.readfile(INPUT, (lines) => {
 
     const length = maze.getPipeLength();
     const furthestPoint = Math.ceil(length / 2);
-    console.log(`Pipe length: ${length}, Furthest Point: ${furthestPoint}`);
+    const enclosedTiles = maze.getEnclosedTiles();
+    console.log(`Pipe length: ${length}, Furthest Point: ${furthestPoint}, Enclosed Tiles: ${enclosedTiles}`);
 
     const endTime = new Date();
     const elapsed = endTime - startTime;
@@ -28,6 +30,7 @@ class Maze {
     #startPosition = { };
     #width;
     #height;
+    #loop = [];
     constructor(lines) {
         this.#lines = lines;
         this.#height = lines.length;
@@ -53,6 +56,7 @@ class Maze {
         let currentLength = 0;
 
         while(true) {
+            this.#loop.push(currentPosition);
             currentPosition = this.#getNextTo(currentDirection, currentPosition.col, currentPosition.row);
             currentPipe = this.getPosition(currentPosition.col, currentPosition.row);
             
@@ -63,6 +67,35 @@ class Maze {
         }
 
         return currentLength;
+    }
+
+    getEnclosedTiles() {
+        let tileCount = 0;
+
+        // Enclosed tiles will be tiles that are not part of the loop and have an odd number of walls to the left and right
+        for (let rowIndex = 0; rowIndex < this.#height; rowIndex++) {
+            let wallCount = 0;
+            let horizPipeStart = '';
+            for (let colIndex = 0; colIndex < this.#width; colIndex++) {
+                let tile = this.getPosition(colIndex, rowIndex);
+                if (tile === 'S') tile = this.#startPosition.pipe;
+                const isLoop = this.#isPartOfLoop(colIndex, rowIndex);
+
+                if (isLoop && (tile === 'F' || tile === 'L')) horizPipeStart = tile;
+                if (isLoop && (tile === '|' || tile === '7' || tile === 'J')) wallCount++
+
+                // If the loop segment is the edge of a loop where both edges go up or down, don't count it as a wall.
+                if (isLoop && horizPipeStart === 'F' && tile === '7') wallCount--;
+                if (isLoop && horizPipeStart === 'L' && tile === 'J') wallCount--;
+                if (tile === '7' || tile === 'J') horizPipeStart = '';
+
+                if (!isLoop && wallCount % 2 === 1) {
+                    tileCount++;
+                    console.log(`Enclosed tile found at row ${rowIndex + 1}, col ${colIndex + 1}`);
+                }
+            }
+        }
+        return tileCount;
     }
 
     #getStart() {
@@ -159,5 +192,13 @@ class Maze {
 
         const exit = pipeExits[0] == enteredExit ? pipeExits[1] : pipeExits[0];
         return exit;
+    }
+
+    #isPartOfLoop(col, row) {
+        for(let i = 0; i < this.#loop.length; i++) {
+            if (this.#loop[i].col === col && this.#loop[i].row === row) return true;
+        }
+
+        return false;
     }
 }
