@@ -17,6 +17,9 @@ readfile.readfile(INPUT, (lines) => {
     const part1 = galaxyMap.getPart1();
     console.log(`Part 1: ${part1}`);
 
+    const part2 = galaxyMap.getPart2();
+    console.log(`Part 2: ${part2}`);
+
     const endTime = new Date();
     const elapsed = endTime - startTime;
     console.log(`Completed at ${endTime}: ${elapsed}ms`);
@@ -27,6 +30,7 @@ class GalaxyMap {
     #galaxies = [];
     #emptyRows = [];
     #emptyCols = [];
+    #expansionScale = 1;
 
     addLine(line) {
         const lineIndex = this.#lines.length;
@@ -67,11 +71,16 @@ class GalaxyMap {
 
                 const dist = this.getDistance(galaxy1, galaxy2);
 
-                console.log(`Distance between galaxy ${i+1} (${galaxy1.row},${galaxy1.col}) and galaxy ${j+1}(${galaxy2.row},${galaxy2.col}) is ${dist}`);
+                // console.log(`Distance between galaxy ${i+1} (${galaxy1.row},${galaxy1.col}) and galaxy ${j+1}(${galaxy2.row},${galaxy2.col}) is ${dist}`);
                 total += dist;
             }
         }
         return total;
+    }
+
+    getPart2() {    
+        this.#expansionScale = 999999;
+        return this.getPart1();
     }
 
     getDistance(galaxy1, galaxy2) {
@@ -88,7 +97,7 @@ class GalaxyMap {
             if (this.#emptyRows.indexOf(i) >= 0) emptyRows++;
         }
 
-        return emptyRows;
+        return emptyRows * this.#expansionScale;
     }
 
     getEmptyCols(startIndex, endIndex) {
@@ -97,6 +106,6 @@ class GalaxyMap {
             if (this.#emptyCols.indexOf(i) >= 0) emptyCols++;
         }
 
-        return emptyCols;
+        return emptyCols * this.#expansionScale;
     }
 }
