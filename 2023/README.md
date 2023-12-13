@@ -1,8 +1,10 @@
 # 2023 Notes
 
+[Return to root README.md](../README.md)
+
 ## Day 1
 
-I started this one out with a simple regex that removed all non-digit characters.  This worked great for part 1.  For part 2, I 
+I started this one out with a simple regex that removed all non-digit characters.  This worked great for part 1.  For part 2, I
 initially tried to just replace each number word with the actual number, but then I realized that they were combining some of the
 words so that the last letter of one word was the first letter of the next word. I then just inserted the number in front of the word.
 Later I realized I made another update where I replaced the word with the first letter, number, then last letter of the word.  
@@ -10,7 +12,14 @@ For example, one became o1e, two became t2o, etc.  This worked great.
 
 ## Day 2
 
+This was a pretty simple one. For part 1, I simply had to make sure each game didn't have any more of the stones than were available.
+For part 2, it was a simple matter of finding the highest number of stones used in any individual game for each color.  
+
 ## Day 3
+
+For this one I built a grid that tracked where the numbers and symbols were located.  I then had a function that would check the position
+of those numbers and symbols to find numbers adjacent to symbols.  For part 2, I just had to look at numbers adjacent to each '*' symbol 
+and see if there were exactly 2.
 
 ## Day 4
 
