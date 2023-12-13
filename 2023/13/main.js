@@ -11,10 +11,14 @@ readfile.readfile(INPUT, (lines) => {
 
     let map = new MirrorMap();
     let part1Total = 0;
+    let part2Total = 0;
     lines.forEach((line) => {
         if (line === '') {
             map.findMirror();
             part1Total += map.getValue();
+
+            map.findMirrorWithSmudge();
+            part2Total += map.getValue();
             map = new MirrorMap();
         }
         else {
@@ -25,7 +29,11 @@ readfile.readfile(INPUT, (lines) => {
     map.findMirror();
     part1Total += map.getValue();
 
+    map.findMirrorWithSmudge();
+    part2Total += map.getValue();
+
     console.log(`Part 1 total: ${part1Total}`);
+    console.log(`Part 2 total: ${part2Total}`);
     stopwatch.stop();
 });
 
@@ -49,6 +57,19 @@ class MirrorMap {
         }
     }
 
+    findMirrorWithSmudge() {
+        this.#mirrorRow = this.#findMirrorLineWithSmudge(this.#rows);
+
+        if (!this.#mirrorRow) {
+            this.#calculateColumns();
+            this.#mirrorCol = this.#findMirrorLineWithSmudge(this.#columns);
+            if (!this.#mirrorCol) throw 'No mirror found';
+        }
+        else {
+            this.#mirrorCol = null;
+        }
+    }
+
     getValue() {
         if (this.#mirrorCol) return Math.ceil(this.#mirrorCol);
         if (this.#mirrorRow) return 100 * Math.ceil(this.#mirrorRow);
@@ -56,6 +77,7 @@ class MirrorMap {
     }
 
     #calculateColumns() {
+        if (this.#columns && this.#columns.length > 0) return;
         this.#rows.forEach((row, index) => {
             for(let charIndex = 0; charIndex < row.length; charIndex++) {
                 const char = row[charIndex];
@@ -84,5 +106,35 @@ class MirrorMap {
             if (mirror) return i + 0.5;
         }
         return null;
+    }
+
+    #findMirrorLineWithSmudge(lines) {
+        for(let i = 0; i < lines.length - 1; i++) {
+            let offset = 0;
+            let mirror = true;
+            let smudges = 0;
+            while(i - offset >= 0 && i + offset + 1 < lines.length) {
+                let smudge = this.#compareLineWithSmudge(lines[i - offset], lines[i + offset + 1]);
+                smudges += smudge;
+                if (smudge === -1 || smudges > 1) {
+                    mirror = false;
+                    break;
+                }
+                offset++;
+            }
+            if (mirror && smudges === 1) return i + 0.5;
+        }
+        return null;
+    }
+
+    #compareLineWithSmudge(line1, line2) {
+        let differences = 0;
+        for(let i = 0; i < line1.length; i++) {
+            if (line1[i] !== line2[i]) differences++;
+        }
+
+        if (differences === 1) return 1;
+        if (differences === 0) return 0;
+        return -1;
     }
 }
