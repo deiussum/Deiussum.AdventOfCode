@@ -9,13 +9,20 @@ readfile.readfile(INPUT, (lines) => {
 
     stopwatch.start();
     let partItotal = 0;
-    lines.forEach((line) => {
+    let partIItotal = 0;
+    lines.forEach((line, index) => {
+        console.log(`Processing line ${index + 1}`);
         const springs = new Springs(line);
 
         partItotal += springs.getPossibleArrangmentCount();
+
+        springs.unfold();
+        partIItotal += springs.getPossibleArrangmentCount();
+        console.log(`Part 2 so far: ${partIItotal}`);
     });
 
     console.log(`Part 1 total: ${partItotal}`);
+    console.log(`Part 2 total: ${partIItotal}`);
 
     stopwatch.stop();
 });
@@ -24,6 +31,7 @@ class Springs {
     #line = '';
     #arrangement = '';
     #groups = [];
+    #memo = [];
 
     constructor(line) {
         this.#line = line;
@@ -31,14 +39,30 @@ class Springs {
     }
 
     getPossibleArrangmentCount() {
-        const arrangements = this.#getPossibleArrangements();
-
+        const requiredEmpty = this.#groups.length - 1;
+        let groupSize = 0;
+        for(let i = 0; i < this.#groups.length; i++) {
+            groupSize += this.#groups[i];
+        }
+        const extraEmpty = this.#arrangement.length - requiredEmpty - groupSize;
         let count = 0;
-        arrangements.forEach((arr) => {
-            if (this.#matchesPattern(arr)) count++;
-        });
+        
+        for (let start = 0; start <= extraEmpty; start++) {
+            const input = '.'.repeat(start)
+            count += this.#getArrangementCount(input, 0);
+        }
 
         return count;
+    }
+
+    unfold() {
+        this.#arrangement += ('?' + this.#arrangement).repeat(4);
+
+        let unfoldedGroups = [];
+        for(let i = 0; i < 5; i++) {
+            unfoldedGroups = unfoldedGroups.concat(this.#groups);
+        }
+        this.#groups = unfoldedGroups;
     }
 
     #parseLine() {
@@ -50,61 +74,87 @@ class Springs {
         numberSplits.forEach((n) => this.#groups.push(Number(n)));
     }
 
-    #getPossibleArrangements() {
-        const startEndOptions = [];
-        let sum = 0;
-        this.#groups.forEach((group) => sum += group);
-        const minEmpty = this.#groups.length - 1;
-        const extraEmpty = this.#arrangement.length - sum - minEmpty;
+    #getArrangementCount(firstPart, groupIndex) {
+        const group = this.#groups[groupIndex];
+        const groupString = '#'.repeat(group);
+        let newInput = firstPart + groupString;
 
-        for (let start = 0; start <= extraEmpty; start++) {
-            startEndOptions.push('.'.repeat(start));
+        if (!this.#matchesPattern(newInput)) return 0;
+
+        const remainingLength = this.#arrangement.length - newInput.length;
+        if (groupIndex === this.#groups.length -1) {
+
+            newInput += '.'.repeat(remainingLength);
+            
+            const newCount = this.#matchesPattern(newInput) ? 1 : 0;
+            this.#memoize(firstPart, groupIndex, newCount);
+
+            return newCount;
         }
 
-        const middleOptions = this.#combineLists(startEndOptions, [ '.' ]);
-        let arrangements = startEndOptions;
-        for(let i = 0; i < this.#groups.length; i++) {
-            const groupSize = this.#groups[i];
-            let group = '#'.repeat(groupSize);
-
-            arrangements = this.#combineLists(arrangements, [ group ]);
-            const groupOptions = [];
-
-            const isLast = i === this.#groups.length - 1;
-            if (isLast) continue;
-            arrangements = this.#combineLists(arrangements, middleOptions);
-
+        const remainingGroups = this.#groups.length - groupIndex - 1;
+        let remainingGroupSize = 0;
+        for(let i = groupIndex + 1; i < this.#groups.length; i++) {
+            remainingGroupSize += this.#groups[i];
         }
 
-        arrangements = this.#combineLists(arrangements, startEndOptions);
+        let remainingHashes = 0;
+        for (let i = newInput.length; i < this.#arrangement.length; i++) {
+            if (this.#arrangement[i] === '#') remainingHashes++;
+        }
+        if (remainingHashes > remainingGroupSize) return 0;
 
-        const possibleOptions = [];
+        const emptySpaceCount = remainingLength - remainingGroupSize - remainingGroups;
+        if (emptySpaceCount < 0) return 0;
 
-        arrangements.forEach((x) => {
-            if (x.length === this.#arrangement.length) {
-                possibleOptions.push(x);
-            }
-        });
+        if (this.#arrangement[newInput.length] === '#') return 0;
 
-        return possibleOptions;
+        const memo = this.#findMemo(firstPart, groupIndex);
+        if (memo) {
+            return memo;
+        } 
+
+        var count = 0;
+        for(var i = 1; i <= emptySpaceCount + 1; i++) {
+            const empty = '.'.repeat(i);
+            const addCount = this.#getArrangementCount(newInput + empty, groupIndex + 1);
+            count += addCount;
+        }
+
+        if (count > 0) this.#memoize(firstPart, groupIndex, count);
+        return count;
     }
 
-    #combineLists(list1, list2) {
-        const newList = [];
-
-        list1.forEach((x) => {
-            list2.forEach((y) => {
-                newList.push(x + y);
-            });
-        });
-
-        return newList;
-    }
-
-    #matchesPattern(pattern) {
-        for(let i = 0; i < pattern.length; i++) {
+    #matchesPattern(pattern, length) {
+        if (!length) length = pattern.length;
+        for(let i = 0; i < length; i++) {
             if (pattern[i] !== this.#arrangement[i] && this.#arrangement[i] !== '?') return false;
         }
         return true;
+    }
+
+    #memoize(firstPart, groupIndex, result) {
+        // if (result === 0) return;
+        const remaining = this.#arrangement.slice(firstPart.length);
+        const memo = {
+            remaining: remaining,
+            groupIndex: groupIndex,
+            result: result
+        };
+        this.#memo.push(memo);
+    }
+
+    #findMemo(firstPart, groupIndex) {
+        const remaining = this.#arrangement.slice(firstPart.length);
+
+        for(let i = 0; i < this.#memo.length; i++) {
+            const memo = this.#memo[i];
+
+            if (memo.remaining === remaining && memo.groupIndex == groupIndex) {
+                return memo.result
+            }
+        }
+
+        return null;
     }
 }
