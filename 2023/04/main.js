@@ -1,10 +1,12 @@
 const readfile = require('../../common/node/readfile');
+const stopwatch = require('../../common/node/stopwatch');
 
 const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
 
 readfile.readfile(INPUT, (lines) => {
-    if (lines.length === 0) console.log('No input to process');
+    stopwatch.start();
+    if (lines.length === 0) stopwatch.timelog('No input to process');
 
     let totalScore = 0;
     const cards = []
@@ -17,7 +19,7 @@ readfile.readfile(INPUT, (lines) => {
 
         cards.push(card);
 
-        console.log(`Card: ${cardNumber}, Score: ${score}`)
+        stopwatch.timelog(`Card: ${cardNumber}, Score: ${score}`)
     });
 
     let totalCards = 0;
@@ -34,8 +36,9 @@ readfile.readfile(INPUT, (lines) => {
         }
     });
 
-    console.log(`Total score: ${totalScore}`);
-    console.log(`Total cards: ${totalCards}`);
+    stopwatch.timelog(`Total score: ${totalScore}`);
+    stopwatch.timelog(`Total cards: ${totalCards}`);
+    stopwatch.stop();
 });
 
 class Card {

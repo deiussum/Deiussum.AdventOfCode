@@ -1,63 +1,51 @@
+const dayjs = require('dayjs');
+const duration = require('dayjs/plugin/duration');
+dayjs.extend(duration);
 
 class Stopwatch {
     #startTime = null;
 
     start() {
-        this.#startTime = new Date();
+        this.#startTime = dayjs();
         this.timelog('Starting...')
     }
 
     stop() {
-        const endTime = new Date();
-        const elapsed = endTime - this.#startTime;
+        const endTime = dayjs();
+        const elapsed = endTime.diff(this.#startTime);
         this.timelog('Stopped.');
         return elapsed;
     }
 
     timelog(msg) {
-        const curTime = new Date();
-        const elapsed = curTime - this.#startTime;
-        const dateString = this.formatDate(curTime)
+        const curTime = dayjs();
+        const elapsed = curTime.diff(this.#startTime);
+        const dateString = dayjs().format('YYYY-MM-dd HH:mm:ss.SSS');
         const elapsedString = this.elapsedMillisecondsToString(elapsed);
 
         console.log(`${dateString} (${elapsedString}) - ${msg}`);
     }
 
-    formatDate(date) {
-        const year = date.getFullYear();
-        const month = this.padLeft('0', date.getMonth() + 1, 2);
-        const day = this.padLeft('0', date.getDate(), 2);
-        const hours = this.padLeft('0', date.getHours(), 2);
-        const mins = this.padLeft('0', date.getMinutes(), 2);
-        const secs = this.padLeft('0', date.getSeconds(), 2);
-        const ms = this.padLeft('0', date.getMilliseconds(), 3);
-        return `${year}-${month}-${day} ${hours}:${mins}:${secs}.${ms}`;
-    }
 
     padLeft(char, number, padSize) {
         return (char.repeat(padSize) + number.toString()).slice(-padSize);
     }
 
-    elapsedMillisecondsToString(ms) {
-        const days = Math.floor(ms / MS_PER_DAY);
-        let remaining = ms - days * MS_PER_DAY;
+    elapsedMillisecondsToString(diff) {
+        const elapsed = dayjs.duration(diff);
 
-        const hrs = Math.floor(remaining / MS_PER_HR);
-        remaining -= hrs * MS_PER_HR;
-
-        const mins = Math.floor(remaining / MS_PER_MIN);
-        remaining -= mins * MS_PER_MIN;
-
-        const secs = Math.floor(remaining / MS_PER_SEC);
-        remaining -= secs * MS_PER_SEC;
+        const days = elapsed.days();
+        const hrs = elapsed.hours();
+        const mins = elapsed.minutes();
+        const secs = elapsed.seconds();
+        const ms = elapsed.milliseconds();
 
         const parts = [];
-
         if (days > 0) parts.push(`${days}d`);
         if (hrs > 0) parts.push(`${hrs}h`);
         if (mins > 0) parts.push(`${mins}m`);
         if (secs > 0) parts.push(`${secs}s`);
-        parts.push(`${remaining}ms`);
+        parts.push(`${ms}ms`);
 
         return parts.join(' ');
     }

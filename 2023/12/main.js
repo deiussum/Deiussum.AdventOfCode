@@ -5,9 +5,9 @@ const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
 
 readfile.readfile(INPUT, (lines) => {
-    if (lines.length === 0) console.log('No input to process');
-
     stopwatch.start();
+    if (lines.length === 0) stopwatch.timelog('No input to process');
+
     let partItotal = 0;
     let partIItotal = 0;
     lines.forEach((line, index) => {
@@ -17,11 +17,11 @@ readfile.readfile(INPUT, (lines) => {
 
         springs.unfold();
         partIItotal += springs.getPossibleArrangmentCount();
-        // console.log(`Part 2 so far: ${partIItotal}`);
+        // stopwatch.timelog(`Part 2 so far: ${partIItotal}`);
     });
 
-    console.log(`Part 1 total: ${partItotal}`);
-    console.log(`Part 2 total: ${partIItotal}`);
+    stopwatch.timelog(`Part 1 total: ${partItotal}`);
+    stopwatch.timelog(`Part 2 total: ${partIItotal}`);
 
     stopwatch.stop();
 });

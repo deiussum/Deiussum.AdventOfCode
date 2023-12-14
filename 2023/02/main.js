@@ -1,4 +1,5 @@
 const readfile = require('../../common/node/readfile');
+const stopwatch = require('../../common/node/stopwatch');
 
 const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
@@ -10,24 +11,26 @@ const totals = {
 };
 
 readfile.readfile(INPUT, (lines) => {
+    stopwatch.start();
     let total = 0;
     let powerTotal = 0;
 
     lines.forEach((line) => {
-        // console.log(line);
+        // stopwatch.timelog(line);
         const game = new Game(line);
 
         if (game.isValid(totals.red, totals.green, totals.blue)) {
-            console.log(`Valid: ${game.toString()}`);
+            stopwatch.timelog(`Valid: ${game.toString()}`);
             total += game.getValue();
         }
         else {
-            console.log(`Invalid: ${game.toString()}`);
+            stopwatch.timelog(`Invalid: ${game.toString()}`);
         }
         powerTotal += game.getPower();
     });
-    console.log(`Total is ${total}`);
-    console.log(`Total power is ${powerTotal}`);
+    stopwatch.timelog(`Total is ${total}`);
+    stopwatch.timelog(`Total power is ${powerTotal}`);
+    stopwatch.stop();
 });
 
 class Hand {
@@ -108,7 +111,7 @@ class Game {
     #getId(line) {
         const matches = /^Game (\d+):/.exec(line);
         if (!matches) {
-            console.log(`Invalid input: ${line}`);
+            stopwatch.timelog(`Invalid input: ${line}`);
             return;
         }
 

@@ -1,6 +1,8 @@
 const fs = require('fs');
 const readline = require('readline');
+const stopwatch = require('../../common/node/stopwatch');
 
+stopwatch.start();
 const fileStream = fs.createReadStream('input.txt');
 const rl = readline.createInterface({
     input: fileStream,
@@ -39,18 +41,19 @@ const getDigits = (line) => {
 
 let total = 0;
 rl.on('line', function(line) {
-    //console.log(line);
+    //stopwatch.timelog(line);
     const digits = getDigits(line);
     const firstDigit = digits.slice(0, 1);
     const lastDigit = digits.slice(-1);
 
     const lineVal = Number(`${firstDigit}${lastDigit}`);
-    console.log(`${lineVal} - ${line}`);
+    stopwatch.timelog(`${lineVal} - ${line}`);
 
     total += lineVal;
 });
 
 rl.on('close', function() {
-    console.log(`Total is: ${total}`);
+    stopwatch.timelog(`Total is: ${total}`);
+    stopwatch.stop();
 });
 

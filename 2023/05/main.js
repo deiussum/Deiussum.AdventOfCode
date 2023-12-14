@@ -1,10 +1,12 @@
 const readfile = require('../../common/node/readfile');
+const stopwatch = require('../../common/node/stopwatch');
 
 const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
 
 readfile.readfile(INPUT, (lines) => {
-    if (lines.length === 0) console.log('No input to process');
+    stopwatch.start();
+    if (lines.length === 0) stopwatch.timelog('No input to process');
 
     let seeds = [];
     const almanac = new Almanac();
@@ -37,11 +39,11 @@ readfile.readfile(INPUT, (lines) => {
             seed: seed,
             location: location
         };
-        console.log(seedLocation);
+        stopwatch.timelog(seedLocation);
 
         return seedLocation;
     });
-    console.log(`Lowest Location: ${minLocation}`);
+    stopwatch.timelog(`Lowest Location: ${minLocation}`);
 
     // Part II
     const seedRanges = []
@@ -59,7 +61,8 @@ readfile.readfile(INPUT, (lines) => {
 
         if (minLocation2 === 0 || location < minLocation2) minLocation2 = location;
     });
-    console.log(`Lowest Location part 2: ${minLocation2}`);
+    stopwatch.timelog(`Lowest Location part 2: ${minLocation2}`);
+    stopwatch.stop();
 });
 
 class AlmanacMap {

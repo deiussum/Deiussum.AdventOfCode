@@ -5,9 +5,8 @@ const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
 
 readfile.readfile(INPUT, (lines) => {
-    if (lines.length === 0) console.log('No input to process');
-
     stopwatch.start();
+    if (lines.length === 0) stopwatch.timelog('No input to process');
 
     const platform = new Platform(lines);
 

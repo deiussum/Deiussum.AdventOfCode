@@ -1,11 +1,13 @@
 const readfile = require('../../common/node/readfile');
+const stopwatch = require('../../common/node/stopwatch');
 
 const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
 
 readfile.readfile(INPUT, (lines) => {
-    if (lines.length === 0) console.log('No input to process');
-    const startTime = new Date();
+    if (lines.length === 0) stopwatch.timelog('No input to process');
+
+    stopwatch.start();
 
     const sequences = [];
     let part1Total = 0;
@@ -19,15 +21,13 @@ readfile.readfile(INPUT, (lines) => {
         const prevSequence = sequence.getPrevValue();
         part2Total += prevSequence
 
-        console.log(`${prevSequence} <= ${line} => ${nextSequence}`);
+        stopwatch.timelog(`${prevSequence} <= ${line} => ${nextSequence}`);
     });
 
-    console.log(`Part 1 total is ${part1Total}`);
-    console.log(`Part 2 total is ${part2Total}`);
+    stopwatch.timelog(`Part 1 total is ${part1Total}`);
+    stopwatch.timelog(`Part 2 total is ${part2Total}`);
 
-    const endTime = new Date();
-    const elapsed = endTime - startTime;
-    console.log(`Completed in ${elapsed}ms`);
+    stopwatch.stop();
 });
 
 

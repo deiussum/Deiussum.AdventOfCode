@@ -1,13 +1,12 @@
 const readfile = require('../../common/node/readfile');
+const stopwatch = require('../../common/node/stopwatch');
 
 const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
 
 readfile.readfile(INPUT, (lines) => {
-    if (lines.length === 0) console.log('No input to process');
-
-    const startTime = new Date();
-    console.log(`Starting at ${startTime}`);
+    stopwatch.start();
+    if (lines.length === 0) stopwatch.timelog('No input to process');
 
     const galaxyMap = new GalaxyMap();
     lines.forEach((line) => {
@@ -15,14 +14,12 @@ readfile.readfile(INPUT, (lines) => {
     });
 
     const part1 = galaxyMap.getPart1();
-    console.log(`Part 1: ${part1}`);
+    stopwatch.timelog(`Part 1: ${part1}`);
 
     const part2 = galaxyMap.getPart2();
-    console.log(`Part 2: ${part2}`);
+    stopwatch.timelog(`Part 2: ${part2}`);
 
-    const endTime = new Date();
-    const elapsed = endTime - startTime;
-    console.log(`Completed at ${endTime}: ${elapsed}ms`);
+    stopwatch.stop();
 });
 
 class GalaxyMap {
@@ -71,7 +68,7 @@ class GalaxyMap {
 
                 const dist = this.getDistance(galaxy1, galaxy2);
 
-                // console.log(`Distance between galaxy ${i+1} (${galaxy1.row},${galaxy1.col}) and galaxy ${j+1}(${galaxy2.row},${galaxy2.col}) is ${dist}`);
+                // stopwatch.timelog(`Distance between galaxy ${i+1} (${galaxy1.row},${galaxy1.col}) and galaxy ${j+1}(${galaxy2.row},${galaxy2.col}) is ${dist}`);
                 total += dist;
             }
         }

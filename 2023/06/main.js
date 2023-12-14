@@ -1,10 +1,12 @@
 const readfile = require('../../common/node/readfile');
+const stopwatch = require('../../common/node/stopwatch');
 
 const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
 
 readfile.readfile(INPUT, (lines) => {
-    if (lines.length === 0) console.log('No input to process');
+    stopwatch.start();
+    if (lines.length === 0) stopwatch.timelog('No input to process');
 
     const times = [];
     const distances = [];
@@ -37,10 +39,12 @@ readfile.readfile(INPUT, (lines) => {
         part1Total *= waysToWin;
     }
 
-    console.log(`Part 1 1otal is ${part1Total}`)
+    stopwatch.timelog(`Part 1 1otal is ${part1Total}`)
 
     const part2WaysToWin = getWaysToWin(part2Time, part2Distance);
-    console.log(`Part 2 ways to win is ${part2WaysToWin}`);
+    stopwatch.timelog(`Part 2 ways to win is ${part2WaysToWin}`);
+
+    stopwatch.stop();
 });
 
 const parseNumbersToList = (numberString) => {
@@ -68,6 +72,6 @@ const getWaysToWin = (time, distance) => {
     const num2 = time - num1;
     const waysToWin = Math.abs(num2 - num1 + 1);
 
-    console.log(`Time: ${time}, Distance: ${distance}, Num1: ${num1}, Num2: ${num2}, Ways to win: ${waysToWin}`);
+    stopwatch.timelog(`Time: ${time}, Distance: ${distance}, Num1: ${num1}, Num2: ${num2}, Ways to win: ${waysToWin}`);
     return waysToWin;
 }

@@ -5,9 +5,8 @@ const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
 
 readfile.readfile(INPUT, (lines) => {
-    if (lines.length === 0) console.log('No input to process');
-
     stopwatch.start();
+    if (lines.length === 0) stopwatch.timelog('No input to process');
 
     let map = new MirrorMap();
     let part1Total = 0;
@@ -32,8 +31,8 @@ readfile.readfile(INPUT, (lines) => {
     map.findMirrorWithSmudge();
     part2Total += map.getValue();
 
-    console.log(`Part 1 total: ${part1Total}`);
-    console.log(`Part 2 total: ${part2Total}`);
+    stopwatch.timelog(`Part 1 total: ${part1Total}`);
+    stopwatch.timelog(`Part 2 total: ${part2Total}`);
     stopwatch.stop();
 });
 

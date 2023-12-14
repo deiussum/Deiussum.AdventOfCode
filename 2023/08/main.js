@@ -1,11 +1,13 @@
 const readfile = require('../../common/node/readfile');
+const stopwatch = require('../../common/node/stopwatch');
 
 const TEST_INPUT = 'input-test.txt';
 const TEST_INPUT2 = 'input-test2.txt';
 const INPUT = 'input.txt';
 
 readfile.readfile(INPUT, (lines) => {
-    if (lines.length === 0) console.log('No input to process');
+    stopwatch.start();
+    if (lines.length === 0) stopwatch.timelog('No input to process');
 
     const nodeMap = new NodeMap();
 
@@ -18,10 +20,10 @@ readfile.readfile(INPUT, (lines) => {
     });
 
     const path1 = nodeMap.getPath(instructions);
-    console.log(`Path length: ${path1.length}`);
+    stopwatch.timelog(`Path length: ${path1.length}`);
 
     const startTime = new Date();
-    console.log(`Started at ${startTime}`);
+    stopwatch.timelog(`Started at ${startTime}`);
     // This solution takes way too long. I ran it for around 12 hours and it barely broke 
     // 250 million.  The answer is around 7 trillion, so I gave up on it. :)
     //const path2Size = nodeMap.getGhostPath(instructions);
@@ -30,10 +32,9 @@ readfile.readfile(INPUT, (lines) => {
     // the puzzle is setup so each of the paths has a recurring pattern between the start and
     // end nodes and you need to find the lowest common multiple.  
     const path2Size = nodeMap.getPart2PathLcm(instructions);
-    console.log(`Path length part 2: ${path2Size}`);
-    const endTime = new Date();
-    const timeSpent = endTime - startTime;
-    console.log(`Finished at ${endTime}.  ${timeSpent}ms`);
+    stopwatch.timelog(`Path length part 2: ${path2Size}`);
+
+    stopwatch.stop();
 });
 
 class Node {
@@ -102,7 +103,7 @@ class NodeMap {
             distances.push(this.#getDistanceToFirstEndNode(node, instructions));
         });
 
-        console.log(distances);
+        stopwatch.timelog(distances);
 
         let lcm = 0;
         distances.forEach((distance) => {

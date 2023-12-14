@@ -1,10 +1,12 @@
 const readfile = require('../../common/node/readfile');
+const stopwatch = require('../../common/node/stopwatch');
 
 const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
 
 readfile.readfile(INPUT, (lines) => {
-    if (lines.length === 0) console.log('No input to process');
+    stopwatch.start();
+    if (lines.length === 0) stopwatch.timelog('No input to process');
 
     const hands = [];
     lines.forEach((line) => {
@@ -17,21 +19,22 @@ readfile.readfile(INPUT, (lines) => {
     let part1Total = 0;
     hands.forEach((hand, index) => {
         hand.setRank(index + 1);
-        console.log(hand.toString());
+        stopwatch.timelog(hand.toString());
         part1Total += hand.getValue();
     });
 
-    console.log(`Part 1 total: ${part1Total}`);
+    stopwatch.timelog(`Part 1 total: ${part1Total}`);
 
     // Part 2
     hands.sort((x, y) => { return x.jokerCompareTo(y); });
     let part2Total = 0;
     hands.forEach((hand, index) => {
         hand.setRank(index + 1);
-        console.log(hand.toString(true));
+        stopwatch.timelog(hand.toString(true));
         part2Total += hand.getValue();
     });
-    console.log(`Part 2 total: ${part2Total}`);
+    stopwatch.timelog(`Part 2 total: ${part2Total}`);
+    stopwatch.stop();
 });
 
 const FIVE_OF_A_KIND = 1;

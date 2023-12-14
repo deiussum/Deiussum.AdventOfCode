@@ -1,28 +1,25 @@
 const readfile = require('../../common/node/readfile');
+const stopwatch = require('../../common/node/stopwatch');
 
 const TEST_INPUT = 'input-test.txt';
 const TEST_INPUT2 = 'input-test2.txt';
 const INPUT = 'input.txt';
 
 readfile.readfile(INPUT, (lines) => {
-    if (lines.length === 0) console.log('No input to process');
+    if (lines.length === 0) stopwatch.timelog('No input to process');
 
-    const startTime = new Date();
-    console.log(`Starting at ${startTime}`);
+    stopwatch.start();
 
     const maze = new Maze(lines);
     const start = maze.getStart();
-    console.log(`Maze starts at row ${start.row + 1}, col ${start.col + 1}, pipe: ${start.pipe}`);
+    stopwatch.timelog(`Maze starts at row ${start.row + 1}, col ${start.col + 1}, pipe: ${start.pipe}`);
 
     const length = maze.getPipeLength();
     const furthestPoint = Math.ceil(length / 2);
     const enclosedTiles = maze.getEnclosedTiles();
-    console.log(`Pipe length: ${length}, Furthest Point: ${furthestPoint}, Enclosed Tiles: ${enclosedTiles}`);
+    stopwatch.timelog(`Pipe length: ${length}, Furthest Point: ${furthestPoint}, Enclosed Tiles: ${enclosedTiles}`);
 
-    const endTime = new Date();
-    const elapsed = endTime - startTime;
-    console.log(`Completed at ${endTime}: ${elapsed}ms`);
-
+    stopwatch.stop();
 });
 
 class Maze {
@@ -91,7 +88,7 @@ class Maze {
 
                 if (!isLoop && wallCount % 2 === 1) {
                     tileCount++;
-                    console.log(`Enclosed tile found at row ${rowIndex + 1}, col ${colIndex + 1}`);
+                    stopwatch.timelog(`Enclosed tile found at row ${rowIndex + 1}, col ${colIndex + 1}`);
                 }
             }
         }

@@ -1,10 +1,12 @@
 const readfile = require('../../common/node/readfile');
+const stopwatch = require('../../common/node/stopwatch');
 
 const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
 
 
 readfile.readfile(INPUT, (lines) => {
+    stopwatch.start();
     const engine = new Engine();
 
     lines.forEach((line) => {
@@ -14,8 +16,9 @@ readfile.readfile(INPUT, (lines) => {
     const sumOfPartNumbers = engine.getSumOfPartNumbers()
     const sumOfGearRatios = engine.getSumOfGearRatios()
 
-    console.log(`Sum of part numbers is: ${sumOfPartNumbers}`);
-    console.log(`Sum of gear ratios is: ${sumOfGearRatios}`);
+    stopwatch.timelog(`Sum of part numbers is: ${sumOfPartNumbers}`);
+    stopwatch.timelog(`Sum of gear ratios is: ${sumOfGearRatios}`);
+    stopwatch.stop();
 });
 
 class EngineRow {
@@ -121,23 +124,23 @@ class Engine {
 
                 if (previousRow && previousRow.hasSymbol(startIndex, endIndex)) {
                     total += number.number;
-                    console.log(`Row: ${rowIndex}, Number: ${number.number}, Symbols on previous line`);
+                    stopwatch.timelog(`Row: ${rowIndex}, Number: ${number.number}, Symbols on previous line`);
                     continue;
                 }
 
                 if (currentRow.hasSymbol(startIndex) || currentRow.hasSymbol(endIndex)) {
                     total += number.number;
-                    console.log(`Row: ${rowIndex}, Number: ${number.number}, Symbols on same line`);
+                    stopwatch.timelog(`Row: ${rowIndex}, Number: ${number.number}, Symbols on same line`);
                     continue;
                 }
 
                 if (nextRow && nextRow.hasSymbol(startIndex, endIndex)) {
                     total += number.number;
-                    console.log(`Row: ${rowIndex}, Number: ${number.number}, Symbols on next line`);
+                    stopwatch.timelog(`Row: ${rowIndex}, Number: ${number.number}, Symbols on next line`);
                     continue;
                 }
 
-                console.log(`Row: ${rowIndex}, Number: ${number.number}, No adjacent symbols`);
+                stopwatch.timelog(`Row: ${rowIndex}, Number: ${number.number}, No adjacent symbols`);
             }
         }
 
@@ -201,7 +204,7 @@ class Engine {
 
                 gears.push(gear);
 
-                console.log(`Gear found - Row:${rowIndex}, Column:${symbol.index}, Number1:${gear.number1}, Number2:${gear.number2}, Ratio:${gear.gearRatio} `);
+                stopwatch.timelog(`Gear found - Row:${rowIndex}, Column:${symbol.index}, Number1:${gear.number1}, Number2:${gear.number2}, Ratio:${gear.gearRatio} `);
             }
         }
 
