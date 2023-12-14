@@ -89,3 +89,8 @@ For checking on columns, I transposed the lines so I had each column as a single
 For part 2, I made separate functions to deal with the smudge and instead of looking for equality, I compared how many characters were
 different between each line.  If there was 1 character difference, it was a potential smudge.  I made sure there were no more than 1
 total smudges in a potential mirror.
+
+## Day 14
+
+Part 1 was fairly simple.  Simply break down the lines into a grid, then for tilting N move each O as far is it can go and add up the
+loads.
