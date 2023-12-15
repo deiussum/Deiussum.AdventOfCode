@@ -94,13 +94,15 @@ total smudges in a potential mirror.
 
 Part 1 was fairly simple.  Simply break down the lines into a grid, then for tilting N move each O as far is it can go and add up the
 loads.
-Part 2 was more complicated.  You need to do a 'spin cycle' 1000000000 times and then get the score.  My first thought was that at 
+Part 2 was more complicated.  You need to do a 'spin cycle' 1000000000 times and then get the score.  My first thought was that at
 some point you are probably going to start going into a repeating pattern so I saved a snapshot of the platform after each cycle
 and then attempted to compare the current platform to one of the snapshots so I could get an idea of that cycle.  It never seemed
 to find a repeating pattern, though.  I spent way too much time trying to find another way to optimize it before looking up tips.
-It seemed like other people hadd a cycle so I went back and looked at my snapshot code and eventually I realized that I had a bug 
+It seemed like other people hadd a cycle so I went back and looked at my snapshot code and eventually I realized that I had a bug
 in my code to compare the current state with the snapshot table. :)  Once I got that fixed, it worked great.
 
 ## Day 15
 
 Part 1 was a simple adding the sum of the ASCII characters with a minor twist.  Nothing tricky about it at all.
+Part 2 was a fairly simple processing of each of the original hashes to arrange them into a series of light boxes and then get the
+final power.
