@@ -100,3 +100,7 @@ and then attempted to compare the current platform to one of the snapshots so I 
 to find a repeating pattern, though.  I spent way too much time trying to find another way to optimize it before looking up tips.
 It seemed like other people hadd a cycle so I went back and looked at my snapshot code and eventually I realized that I had a bug 
 in my code to compare the current state with the snapshot table. :)  Once I got that fixed, it worked great.
+
+## Day 15
+
+Part 1 was a simple adding the sum of the ASCII characters with a minor twist.  Nothing tricky about it at all.
