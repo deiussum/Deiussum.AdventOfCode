@@ -10,8 +10,15 @@ readfile.readfile(INPUT, (lines) => {
     if (lines.length === 0) stopwatch.timelog('No input to process');
 
     const grid = new Grid(lines);
+
+    grid.traceBeam(0, 0, 'W');
+    grid.printEnergized();
+
     const part1Total = grid.getEnergizedCount();
     stopwatch.timelog(`Part 1 total: ${part1Total}`);
+
+    const part2Total = grid.findMaxEnergy();
+    stopwatch.timelog(`Part 2 total: ${part2Total}`);
 
     stopwatch.stop();
 });
@@ -52,10 +59,6 @@ class Grid {
     }
 
     getEnergizedCount() {
-        this.#traceBeam(0, 0, 'W');
-
-        this.printEnergized();
-
         const count = this.#rows.reduce((total, row) => {
             return total + row.reduce((rowTotal, cell) => {
                 return rowTotal + (cell.isEnergized() ? 1 : 0);
@@ -75,7 +78,56 @@ class Grid {
         stopwatch.timelog(energyString);
     }
 
-    #traceBeam(row, col, enteredDir) {
+    findMaxEnergy() {
+        let maxEnergy = 0;
+
+        for(let row = 0; row < this.#height; row++) {
+            for(let col = 0; col < this.#width; col++) {
+                const isLeft = col === 0;
+                const isRight = col === this.#width - 1;
+                const isTop = row === 0;
+                const isBottom = row === this.#height - 1;
+
+                this.resetGrid();
+                if (isLeft) {
+                    this.traceBeam(row, col, 'W');
+                    const energizedCount = this.getEnergizedCount();
+                    maxEnergy = Math.max(maxEnergy, energizedCount);
+                } 
+                else if (isRight) {
+                    this.traceBeam(row, col, 'E');
+                    const energizedCount = this.getEnergizedCount();
+                    maxEnergy = Math.max(maxEnergy, energizedCount);
+                }
+
+                this.resetGrid();
+                if (isTop) {
+                    this.traceBeam(row, col, 'N');
+                    const energizedCount = this.getEnergizedCount();
+                    maxEnergy = Math.max(maxEnergy, energizedCount);
+                }
+                else if (isBottom) {
+                    this.traceBeam(row, col, 'S');
+                    const energizedCount = this.getEnergizedCount();
+                    maxEnergy = Math.max(maxEnergy, energizedCount);
+                }
+
+                if (isLeft && !isTop && !isBottom) col += this.#width - 2;
+            }
+        }
+
+        return maxEnergy;
+    }
+
+    resetGrid() {
+        this.#rows.forEach((row) => {
+            row.forEach((cell) => {
+                cell.reset();
+            });
+        });
+    }
+
+    traceBeam(row, col, enteredDir) {
         const stack = [];
         stack.push({ row, col, enteredDir});
 
@@ -172,5 +224,8 @@ class GridCell {
     }
 
     isEnergized() { return this.#isEnergized; }
-
+    reset() {
+        this.#isEnergized = false;
+        this.#enteredFrom = [];
+    }
 }

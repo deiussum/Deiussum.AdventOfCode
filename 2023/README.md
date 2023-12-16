@@ -111,3 +111,6 @@ final power.
 
 This was another fun path tracing pr blem.  For Part 1I started out with a recursive approach, but when I got to my full input, I 
 blew up the call stack.  I modified it to use a stack approach instead and all was good.  I'm scared to see what Part 2 will bring.
+Part 2 wasn't as bad as I was expecting.  I just had to shoot the light beam from every edge and find the greatest power.  It was 
+a simple process of looping through the rows/cols and trying from every angle.  I was able to skip any of the inner columns to 
+improve the performance a bit.
