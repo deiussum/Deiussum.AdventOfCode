@@ -106,3 +106,8 @@ in my code to compare the current state with the snapshot table. :)  Once I got 
 Part 1 was a simple adding the sum of the ASCII characters with a minor twist.  Nothing tricky about it at all.
 Part 2 was a fairly simple processing of each of the original hashes to arrange them into a series of light boxes and then get the
 final power.
+
+## Day 16
+
+This was another fun path tracing pr blem.  For Part 1I started out with a recursive approach, but when I got to my full input, I 
+blew up the call stack.  I modified it to use a stack approach instead and all was good.  I'm scared to see what Part 2 will bring.
