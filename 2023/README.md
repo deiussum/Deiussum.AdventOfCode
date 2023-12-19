@@ -74,7 +74,8 @@ Part 2 wasn't as bad as I was expecting.  I just had to shoot the light beam fro
 
 ## Day 17
 
-Day 17 broke me.  I've got an implementation that works for the test input, but doesn't work for my full input.  I've seen hints on using Dijkstra's algorithm or an A* algorithm, but I think my brain is burned out and I'm not seeing an easy way to account for the going a maximum of 3 blocks in the same direction.  Will probably come back to this.  For now, I'm throwing in the towel.
+Day 17 broke me.  I've got an implementation that works for the test input, but doesn't work for my full input.  I've seen hints on using Dijkstra's algorithm or an A* algorithm, but I think my brain is burned out and I'm not seeing an easy way to account for the going a maximum of 3 blocks in the same direction.  Will probably come back to this.  For now, I'm throwing in the towel.  
+Updates to this:  I tried implementing a Dijkstra's/A* algorithm, but I'm clearly not pruning the paths enough yet.  It's taking way too long.  Currently going on almost 19h and it hasn't finished.  I now know what I missed with my previous implementation, so I might try and include some ideas from that to speed it up.  My previous implementation, I worked backwards to build a cache, restricting the size of the area it checked to a square, walking back to the full square.  The reason that didn't provide the right value is that it is possible that to get the shortest path from somewhere in the middle, the path may need to leave that square.
 
 ## Day 18
 
