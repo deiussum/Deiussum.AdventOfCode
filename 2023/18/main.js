@@ -6,7 +6,7 @@ const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
 const MY_INPUT = 'my-input.txt';
 
-readfile(TEST_INPUT, (lines) => {
+readfile(INPUT, (lines) => {
     stopwatch.start();
     if (lines.length === 0) stopwatch.timelog('No input to process');
 
@@ -37,11 +37,16 @@ class Lagoon {
     }
 
     fill() {
+        stopwatch.timelog('Filling lagoon...');
+        let period = stopwatch.startPeriodicLog(5);
+
         for(let y = 1; y < this.#height - 1; y++) {
             let wallsCrossed = 0;
             let wall = 0;
             let wallUp = 0;
             let wallDown = 0;
+            const percentDone = (y * 100 / this.#height).toFixed(2);
+            stopwatch.periodicLog(period, `Percent done ${percentDone}$`);
 
             for(let x = 0; x < this.#width; x++) {
                 const block = this.#rows[y][x];
@@ -96,10 +101,13 @@ class Lagoon {
     }
 
     #buildEmptyGrid() {
+        stopwatch.timelog('Building initial grid...');
         let currentPosition = new Position(0, 0);
         let minX = 0, maxX = 0, minY = 0, maxY = 0;
 
+        stopwatch.timelog('Getting size of grid...');
         this.#instructions.forEach((instruction) => {
+
             let currentLength = instruction.getLength();
             while(currentLength > 0) {
                 currentPosition = currentPosition.moveDirection(instruction.getDirection());
@@ -118,10 +126,19 @@ class Lagoon {
         this.#height = maxY - minY + 1;
         this.#rows = [];
 
+        stopwatch.timelog(`Building empty grid (width: ${this.#width}, height: ${this.#height})...`);
+        let period = stopwatch.startPeriodicLog(5);
+
         for(let y = 0; y < this.#height; y++) {
+            const percentDone = (y * 100 / this.#height).toFixed(2);
+            stopwatch.periodicLog(period, `Percent done: ${percentDone}`);
+
             const row = [];
             this.#rows.push(row);
             for(let x = 0; x < this.#width; x++) {
+                const percentDone = (y * x * 100 / (this.#height * this.#width)).toFixed(2);
+                stopwatch.periodicLog(period, `Percent done: ${percentDone}`);
+
                 row.push({ block: '.' });
             }
         }
@@ -130,9 +147,14 @@ class Lagoon {
     }
 
     #digTrench(startingPos) {
+        stopwatch.timelog('Digging trench...');
         let currentPosition = startingPos;
 
-        this.#instructions.forEach((instruction) => {
+        let period = stopwatch.startPeriodicLog(5);
+        this.#instructions.forEach((instruction, index) => {
+            const percentDone = (index * 100 / this.#instructions.length).toFixed(2);
+            stopwatch.periodicLog(period, `Percent done: ${percentDone}`);
+
             let currentLength = instruction.getLength();
             while(currentLength > 0) {
                 const row = currentPosition.getRow();

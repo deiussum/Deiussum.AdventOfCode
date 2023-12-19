@@ -26,6 +26,25 @@ class Stopwatch {
         console.log(`${dateString} (${elapsedString}) - ${msg}`);
     }
 
+    startPeriodicLog(seconds) {
+        return {
+            start: dayjs(),
+            everyXseconds: seconds,
+            nextlog: seconds 
+        };
+    }
+
+    periodiclog(period, message) {
+        const diff = dayjs().diff(period.start);
+        const duration = dayjs.duration(diff);
+        const elapsed = duration.asSeconds();
+        const log = period.nextlog <= elapsed;
+        if (log) {
+            this.timelog(message);
+            period.nextlog = elapsed + period.everyXseconds;
+        }
+    }
+
 
     padLeft(char, number, padSize) {
         return (char.repeat(padSize) + number.toString()).slice(-padSize);
@@ -51,13 +70,11 @@ class Stopwatch {
     }
 }
 
-const MS_PER_SEC = 1000;
-const MS_PER_MIN = 60 * MS_PER_SEC;
-const MS_PER_HR = 60 * MS_PER_MIN;
-const MS_PER_DAY = 24 * MS_PER_HR;
 
 const stopwatch = new Stopwatch();
 
 exports.start = () => stopwatch.start(); 
 exports.stop = () => stopwatch.stop(); 
 exports.timelog = (msg) => stopwatch.timelog(msg);
+exports.startPeriodicLog = (seconds) => stopwatch.startPeriodicLog(seconds);
+exports.periodicLog = (period, message) => stopwatch.periodiclog(period, message);

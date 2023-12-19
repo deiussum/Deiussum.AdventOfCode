@@ -80,5 +80,5 @@ Updates to this:  I tried implementing a Dijkstra's/A* algorithm, but I'm clearl
 ## Day 18
 
 I completed part 1 of this while waiting on Day 17 to finish.  This was similar to the day 10 part 2.  I just had to find a slightly different way to figure out when walls were crossed.
-Umm... Part 2 is probably going to have to wait.  Checking in the horribly inefficient way of doing it for now, but even on the test input this would take forever to process using my original code.  I'm going to try and get caught up first and revisit this later.
+Umm... Part 2 is probably going to have to wait.  Checking in the horribly inefficient way of doing it for now, but even on the test input this would take forever to process using my original code.  I'm going to try and get caught up first and revisit this later.  Decided to add in some logging to get an idea how long it would take with the given setup.  Even just building out the initial map would take far too long and would likely end up blowing up my memory. 
 
