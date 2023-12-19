@@ -74,4 +74,8 @@ Part 2 wasn't as bad as I was expecting.  I just had to shoot the light beam fro
 
 ## Day 17
 
-Day 17 broke me.  I've got an implementation that works for the test input, but doesn't work for my full input.  I've seen hints on using Dijkstra's algorithm or an A* algorithm, but I think my brain is burned out and I'm not seeing an easy way to account for the going a maximum of 3 blocks in the same direction.  Will probably come back to this.  For now, I'm throwing in the towel.k
+Day 17 broke me.  I've got an implementation that works for the test input, but doesn't work for my full input.  I've seen hints on using Dijkstra's algorithm or an A* algorithm, but I think my brain is burned out and I'm not seeing an easy way to account for the going a maximum of 3 blocks in the same direction.  Will probably come back to this.  For now, I'm throwing in the towel.
+
+## Day 18
+
+I completed part 1 of this while waiting on Day 17 to finish.  This was similar to the day 10 part 2.  I just had to find a slightly different way to figure out when walls were crossed.

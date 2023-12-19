@@ -17,3 +17,11 @@ exports.readfile = (fileName, onDone) => {
         onDone(lines);
     });
 };
+
+exports.appendfile = (fileName, string) => {
+    fs.writeFileSync(fileName, string, { flag:'a+' });
+}
+
+exports.deletefile = (filename) => {
+    fs.unlinkSync(filename);
+}
