@@ -20,7 +20,7 @@ class Stopwatch {
     timelog(msg) {
         const curTime = dayjs();
         const elapsed = curTime.diff(this.#startTime);
-        const dateString = dayjs().format('YYYY-MM-dd HH:mm:ss.SSS');
+        const dateString = dayjs().format('YYYY-MM-DD HH:mm:ss.SSS');
         const elapsedString = this.elapsedMillisecondsToString(elapsed);
 
         console.log(`${dateString} (${elapsedString}) - ${msg}`);

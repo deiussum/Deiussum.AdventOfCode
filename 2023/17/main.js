@@ -1,17 +1,18 @@
+const { get } = require('http');
 const readfile = require('../../common/node/readfile');
 const stopwatch = require('../../common/node/stopwatch');
+const { Position } = require('../../common/node/utils');
 
 const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
 
-readfile.readfile(INPUT, (lines) => {
+readfile.readfile(TEST_INPUT, (lines) => {
     stopwatch.start();
     if (lines.length === 0) stopwatch.timelog('No input to process');
 
     const city = new City(lines);
     const part1Total = city.getMinimumHeatLoss();
     stopwatch.timelog(`Part 1 total: ${part1Total}`);
-
 
     stopwatch.stop();
 });
@@ -36,8 +37,6 @@ class City {
     #rows = [];
     #width = 0;
     #height = 0;
-    #memo = [];
-    #startingBlock = null;
     
     constructor(lines) {
         lines.forEach((line, row) => this.#rows.push(line.split('').map((block, col) => new Block(block, row, col))));
@@ -45,156 +44,262 @@ class City {
         this.#width = lines[0].length;
     }
 
+    isEndPosition(pos) {
+        return pos.getRow() === this.#height - 1 && pos.getCol() === this.#width - 1;
+    }
+
     getMinimumHeatLoss() {
-        // Build up the cache
-        let heat = 0;
-        for (let x = 1; x <= this.#width; x++) {
-            const pos = this.#width - x;
-            this.#startingBlock = this.getBlock(pos, pos);
-            const traversedBlocks = [ this.#startingBlock ];
-            heat = this.#getMinimumPathFrom(this.#startingBlock.getRow(), this.#startingBlock.getCol(), null, 0, traversedBlocks);
+        return this.#getMinimumHeatLoss(new Position(0, 0), null, 0);
+    }
+
+    #getMinimumHeatLoss(startPos, initialDirection, initialCount) {
+        const pathQueue = new PathQueue();
+        const initialPath = new Path(this);
+
+        initialPath.start(startPos, initialDirection, initialCount);
+
+        pathQueue.push(initialPath);
+
+        let heat = 0
+        var found = false;
+        let maxHeat = 0;
+        let minDistance = this.#width + this.#height;
+        const startTime = new Date();
+        let loggedSecond = 0;
+        while(!found && pathQueue.getLength() > 0) {
+            const path = pathQueue.shift();
+            const block = this.getBlock(path.getCurrentPosition());
+            if (!block.isEasiestPath(path)) continue;
+
+            maxHeat = Math.max(maxHeat, path.getHeat());
+            minDistance = Math.min(minDistance, path.getDistanceToEnd());
+
+            // Log progress every 5 seconds
+            const elapsedSeconds = Math.floor((new Date() - startTime) / 1000);
+            if (elapsedSeconds % 5 === 0 && elapsedSeconds !== loggedSecond) {
+                loggedSecond = elapsedSeconds;
+                stopwatch.timelog(`Queue : ${pathQueue.getLength()} - Heat: ${maxHeat} - Remaining Distance: ${minDistance}`);
+            }
+            const newPaths = path.split();
+            newPaths.forEach((newPath) => {
+                const newHeat = newPath.getHeat();
+                const newPathPos = newPath.getCurrentPosition();
+
+                if (this.isEndPosition(newPath.getCurrentPosition())) {
+                    heat = newHeat;
+                    found = true;
+                }
+                else {
+                    const block = this.getBlock(newPathPos);
+                    if (!block.isEasiestPath(newPath)) return;
+                    pathQueue.push(newPath);
+                }
+            });
         }
 
         return heat;
     }
 
-    getBlock(row, col) {
-        if (row < 0 || row >= this.#height || col < 0 || col >= this.#width) return null;
+    getBlock(pos) {
+        if (!this.isValidPosition(pos)) return null;
 
-        return this.#rows[row][col];
+        return this.#rows[pos.getRow()][pos.getCol()];
     }
 
     getWidth() { return this.#width; }
     getHeight() { return this.#height; }
 
-    #getMinimumPathFrom(fromRow, fromCol, direction, directionCount, traversedBlocks) {
-        const memoResult = this.#getMemoResult(fromRow, fromCol, direction, directionCount);
-        if (memoResult) return memoResult;
+    isValidPosition(pos) {
+        return pos.getRow() >= 0 
+            && pos.getRow() < this.#height 
+            && pos.getCol() >= 0 
+            && pos.getCol() < this.#width;
 
-        const block = this.getBlock(fromRow, fromCol);
-        const isDestination = fromRow === this.#height - 1 && fromCol === this.#width - 1;
-        if (isDestination) {
-            return this.#memoize(fromRow, fromCol, direction, directionCount, 0);
-        }
-
-        const directions = this.#getPossibleDirections(fromRow, fromCol, direction, directionCount);
-        let minHeat = null;
-        directions.forEach((newDirection) => {
-            const newBlock = this.#getBlockInDirection(fromRow, fromCol, newDirection);
-            if (!newBlock) return;
-
-            const blockHasBeenTraversed = traversedBlocks.some((searchBlock) => {
-                return searchBlock.getRow() === newBlock.getRow()
-                    && searchBlock.getCol() === newBlock.getCol();
-            });
-            if (blockHasBeenTraversed) {
-                return;
-            }
-
-            if (direction === newDirection && directionCount === 3) {
-                return;
-            } 
-
-            const newTraversedBlocks = [ ...traversedBlocks];
-            newTraversedBlocks.push(newBlock);
-            const newDirectionCount = direction === newDirection ? directionCount + 1 : 1
-            const minPathForDirection = this.#getMinimumPathFrom(newBlock.getRow(), newBlock.getCol(), newDirection, newDirectionCount, newTraversedBlocks);
-            
-            if (minPathForDirection === null) { 
-                return;
-            }
-            const heat = newBlock.getHeat() + minPathForDirection;
-
-            minHeat = minHeat ? Math.min(minHeat, heat) : heat;
-        });
-        if (!minHeat) {
-            return null;
-        }
-
-        return this.#memoize(fromRow, fromCol, direction, directionCount, minHeat);
     }
 
-    #getBlockInDirection(row, col, direction) {
-        let newRow = row;
-        let newCol = col;
-
-        switch(direction) {
-            case 'N': 
-                newRow--;
-                break;
-            case 'S':
-                newRow++;
-                break;
-            case 'W':
-                newCol--;
-                break;
-            case 'E':
-                newCol++;
-                break;
-            default: throw `Invalid direction: ${direction}`;
-        }
-
-        if (newRow < this.#startingBlock.getRow() || newCol < this.#startingBlock.getCol()) return null;
-
-        return this.getBlock(newRow, newCol);
-    }
-
-    #memoize(fromRow, fromCol, direction, directionCount, result) {
-        const memo = {
-            fromRow, fromCol, direction, directionCount, result
-        };
-        this.#memo.push(memo);
-
-        return result;
-    }
-
-    #getMemoResult(fromRow, fromCol, direction, directionCount) {
-        const found = this.#memo.find((memo) => {
-            return memo.fromRow === fromRow
-                && memo.fromCol === fromCol
-                && memo.direction === direction
-                && memo.directionCount === directionCount;
-        });
-
-        return found ? found.result : null;
-    }
-
-    #getPossibleDirections(row, col, direction, directionCount) {
-        const directions = ['S', 'E', 'N', 'W'];
-
-        if (col === 0) {
-            removeItem(directions, 'W');
-        }
-        if (col === this.#width - 1) {
-            removeItem(directions, 'E');
-        }
-        if (row === 0) {
-            removeItem(directions, 'N');
-        }
-        if (row === this.#height - 1) {
-            removeItem(directions, 'S');
-        }
-
-        if (directionCount === 3) removeItem(directions, direction);
-
-        if (direction) removeItem(directions, getOppositeDirection(direction));
-
-        return directions
+    getDistanceFromEnd(pos) {
+        return (this.#width - pos.getCol()) + (this.#height - pos.getRow());
     }
 }
 
 class Block {
     #heat = 0;
-    #row = null;
-    #col = null;
+    #position = null;
+    #easiestPaths = [];
 
     constructor(char, row, col) {
         this.#heat = Number(char);
-        this.#row = Number(row);
-        this.#col = Number(col);
+        this.#position = new Position(Number(row), Number(col));
     }
 
     getHeat() { return this.#heat; }
-    getRow() { return this.#row; }
-    getCol() { return this.#col; }
+    getPosition() { return this.#position; }
+
+    isEasiestPath(path) {
+        const direction = path.getDirection();
+        const directionCount = path.getDirectionCount();
+        const heat = path.getHeat();
+
+        const foundPath = this.#easiestPaths.find((checkPath) => {
+            return checkPath.direction === direction
+                && checkPath.directionCount === directionCount;
+        });
+
+        if (foundPath && foundPath.heat < heat) return false;
+
+        if (foundPath) {
+            foundPath.heat = heat;
+        }
+        else {
+            const newPath = {
+                direction: direction,
+                directionCount: directionCount,
+                heat: heat
+            };
+            this.#easiestPaths.push(newPath);
+        }
+
+        return true;
+    }
+}
+
+class Path {
+    #city = null;
+    #visited = [];
+    #direction = null;
+    #directionCount = 0;
+    #heat = 0;
+
+    constructor(city) {
+        this.#city = city;
+    }
+
+    getHeat() { return this.#heat; }
+    getDirection() { return this.#direction; }  
+    getDirectionCount() { return this.#directionCount; }
+
+    getDistanceToEnd() {
+        const pos = this.getCurrentPosition();
+        return this.#city.getDistanceFromEnd(pos)
+    }
+    getPriority() { 
+        return this.getDistanceToEnd() + this.#heat;
+    }
+
+    start(position, direction, count) {
+        this.#direction = direction;
+        this.#directionCount = count;
+        this.#heat = 0;
+
+        if (direction !== null && count > 0) {
+            let curPos = position;
+            let curCount = count;
+            while(curCount > 0) {
+                const block = this.#city.getBlock(position);
+                this.#heat += block.getHeat();
+
+                curPos = curPos.moveDirection(getOppositeDirection(direction));
+                curCount--;
+            }
+        }
+            
+        this.#visited.push(position);
+    }
+
+    split() {
+        const newPaths = [];
+
+        const directions = this.#getPossibleDirections();
+        directions.forEach((direction) => {
+            const newPath = new Path(this.#city);
+            newPath.#copy(this.#visited, this.#direction, this.#directionCount, this.#heat);
+            newPath.moveDirection(direction);
+
+            newPaths.push(newPath);
+        });
+
+        return newPaths;
+    }
+
+    moveDirection(direction) {
+        const pos = this.getCurrentPosition();
+        const newPos = pos.moveDirection(direction);
+
+        if (!this.#city.isValidPosition(newPos) || this.hasVisited(newPos)) {
+            throw `Invalid move: ${direction}`;
+        }
+
+        if (this.#direction === direction) {
+            this.#directionCount++;
+        } 
+        else {
+            this.#directionCount = 1;
+        }
+        this.#direction = direction;
+        
+        const block = this.#city.getBlock(newPos);
+        this.#heat += block.getHeat();
+
+        this.#visited.push(newPos);
+    }
+
+    getCurrentPosition() {
+        return this.#visited.at(-1);
+    }
+
+    hasVisited(position) {
+        return this.#visited.find((pos) => {
+            return pos.getRow() === position.getRow()
+                && pos.getCol() === position.getCol();
+        });
+    }
+
+    #copy(visited, direction, directionCount, heat) {
+        this.#visited = [ ...visited];
+        this.#direction = direction;
+        this.#directionCount = directionCount;
+        this.#heat = heat;
+    }
+
+    #getPossibleDirections() {
+        const directions = ['S', 'E', 'N', 'W'];
+        const pos = this.getCurrentPosition();
+
+        const invalidDirections = [];
+        directions.forEach((direction) => {
+            const newPos = pos.moveDirection(direction);
+            if (!this.#city.isValidPosition(newPos) || this.hasVisited(newPos)) {
+                invalidDirections.push(direction);
+            }
+        });
+
+        invalidDirections.forEach((direction) => removeItem(directions, direction));
+
+        if (this.#directionCount === 3) {
+            removeItem(directions, this.#direction);
+        }
+
+        if (this.#direction) {
+            removeItem(directions, getOppositeDirection(this.#direction));
+        }
+
+        return directions
+    }
+}
+
+class PathQueue {
+    #paths = [];
+
+    push(path) {
+        this.#paths.push(path);
+    }
+
+    shift() {
+        this.#paths.sort((a, b) => a.getPriority() - b.getPriority());
+        return this.#paths.shift();
+    }
+
+    getLength() {
+        return this.#paths.length;
+    }
 }
