@@ -6,18 +6,21 @@ const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
 const MY_INPUT = 'my-input.txt';
 
-readfile(INPUT, (lines) => {
+readfile(TEST_INPUT, (lines) => {
     stopwatch.start();
     if (lines.length === 0) stopwatch.timelog('No input to process');
 
     const lagoon = new Lagoon(lines);
-    deletefile('map.txt');
-    appendfile('map.txt', lagoon.toString());
     lagoon.fill();
-    appendfile('map.txt', lagoon.toString());
 
     const part1total = lagoon.getSize();
     stopwatch.timelog(`Part 1: ${part1total}`);
+
+    lagoon.fixInstructions();
+    lagoon.fill();
+
+    const part2total = lagoon.getSize();
+    stopwatch.timelog(`Part 2: ${part2total}`);
 
     stopwatch.stop();
 });
@@ -74,6 +77,11 @@ class Lagoon {
         }, 0);
     }
 
+    fixInstructions() {
+        this.#instructions.forEach(instruction => instruction.fix());
+        this.#processInstructions();
+    }
+
     toString() {
         return '\r\n  ' + this.#rows.reduce((str, row) => {
             return str + row.reduce((rowStr, block) => {
@@ -108,6 +116,7 @@ class Lagoon {
 
         this.#width = maxX - minX + 1;
         this.#height = maxY - minY + 1;
+        this.#rows = [];
 
         for(let y = 0; y < this.#height; y++) {
             const row = [];
@@ -154,4 +163,19 @@ class Instruction {
     getDirection() { return this.#direction; }
     getLength() { return this.#length; }
     getColor() { return this.#color; }
+
+    fix() {
+        this.#length = Number('0x' + this.#color.slice(1, 6));
+        this.#direction = this.#getDirection(this.#color.slice(-1));
+    }
+
+    #getDirection(num) {
+        switch(num) {
+            case '0': return 'R';
+            case '1': return 'D';
+            case '2': return 'L';
+            case '3': return 'U';
+            default: throw `Invalid direction ${num}`;
+        }
+    }
 }
