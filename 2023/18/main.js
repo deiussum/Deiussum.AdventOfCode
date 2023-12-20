@@ -104,7 +104,7 @@ class Lagoon {
     }
 
     saveSvg(fileName, scale) {
-        const width = this.#width * scale;
+        const width = this.#width * scale * 1.2;
         const height = this.#height * scale;
         const translateY = this.#horizontalSplits.getNumbers().at(0) * -1;
         const translateX = this.#verticalSplits.getNumbers().at(0) * -1;
@@ -127,7 +127,7 @@ class Lagoon {
     }
 
     saveSquaresSvg(filename, scale) {
-        const width = this.#width * scale;
+        const width = this.#width * scale * 1.2;
         const height = this.#height * scale;
         const translateY = this.#horizontalSplits.getNumbers().at(0) * -1;
         const translateX = this.#verticalSplits.getNumbers().at(0) * -1;
