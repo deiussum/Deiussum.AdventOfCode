@@ -6,7 +6,7 @@ const { Position } = require('../../common/node/utils');
 const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
 
-readfile.readfile(TEST_INPUT, (lines) => {
+readfile.readfile(INPUT, (lines) => {
     stopwatch.start();
     if (lines.length === 0) stopwatch.timelog('No input to process');
 
@@ -295,7 +295,7 @@ class PathQueue {
     }
 
     shift() {
-        this.#paths.sort((a, b) => a.getPriority() - b.getPriority());
+        this.#paths.sort((a, b) => Number(a.getPriority()) - Number(b.getPriority()));
         return this.#paths.shift();
     }
 

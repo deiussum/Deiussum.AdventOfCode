@@ -17,8 +17,8 @@ readfile(INPUT, (lines) => {
     lagoon.fixInstructions();
     const part2total = lagoon.getArea();
 
-    lagoon.saveSvg('map.svg', 10);
-    lagoon.saveSquaresSvg('mapSquares.svg', 10);
+    lagoon.saveSvg('map.svg', 0.001);
+    lagoon.saveSquaresSvg('mapSquares.svg', 0.001);
     lagoon.saveDebugInfo('debug.csv');
 
     stopwatch.timelog(`Part 2: ${part2total}`);
