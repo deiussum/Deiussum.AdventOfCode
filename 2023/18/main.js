@@ -6,7 +6,7 @@ const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
 const MY_INPUT = 'my-input.txt';
 
-readfile(INPUT, (lines) => {
+readfile(MY_INPUT, (lines) => {
     stopwatch.start();
     if (lines.length === 0) stopwatch.timelog('No input to process');
 
@@ -14,14 +14,14 @@ readfile(INPUT, (lines) => {
     const part1total = lagoon.getArea();
     stopwatch.timelog(`Part 1: ${part1total}`);
 
-    lagoon.fixInstructions();
-    const part2total = lagoon.getArea();
+    // lagoon.fixInstructions();
+    // const part2total = lagoon.getArea();
 
-    lagoon.saveSvg('map.svg', 0.001);
-    lagoon.saveSquaresSvg('mapSquares.svg', 0.001);
+    lagoon.saveSvg('map.svg', 10);
+    lagoon.saveSquaresSvg('mapSquares.svg', 10);
     lagoon.saveDebugInfo('debug.csv');
 
-    stopwatch.timelog(`Part 2: ${part2total}`);
+    // stopwatch.timelog(`Part 2: ${part2total}`);
 
     stopwatch.stop();
 });
