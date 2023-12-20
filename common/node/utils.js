@@ -4,38 +4,43 @@ class Position {
     #col = 0;
 
     constructor(row, col) {
-        this.#row = row;
-        this.#col = col;
+        this.#row = Number(row);
+        this.#col = Number(col);
     }
 
     getRow() { return this.#row; }
     getCol() { return this.#col; }
 
-    moveDirection(direction) {
+    moveDirection(direction, length) {
         let row = this.#row;
         let col = this.#col;
+        let move = (length === null) ? 1 : length;
 
         switch(direction) {
             case 'N': 
             case 'U':
-                row--;
+                row-=move;
                 break;
             case 'S': 
             case 'D':
-                row++;
+                row+=move;
                 break;
             case 'W': 
             case 'L':
-                col--;
+                col-=move;
                 break;
             case 'E': 
             case 'R':
-                col++;
+                col+=move;
                 break;
             default: throw `Invalid direction: ${direction}`
         }
 
         return new Position(row, col);
+    }
+
+    toString() {
+        return `${this.#col},${this.#row}`;
     }
 }
 
@@ -57,3 +62,26 @@ class Cache {
 }
 
 exports.Cache = Cache;
+
+class NumberSet {
+    #numbers = [];
+
+    getNumbers() { return [ ...this.#numbers ]; }
+
+    addNumber(number) {
+        if (!this.hasNumber(number)) {
+            this.#numbers.push(number);
+            this.#numbers = this.#numbers.sort((a, b) => { return Number(a) - Number(b) });
+        }
+    }
+
+    hasNumber(number) {
+        return this.#numbers.indexOf(number) >= 0;
+    }
+
+    clear() {
+        this.#numbers = [];
+    }
+}
+
+exports.NumberSet = NumberSet;

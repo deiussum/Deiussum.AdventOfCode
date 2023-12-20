@@ -1,6 +1,6 @@
-const { readfile, appendfile, deletefile } = require('../../common/node/readfile');
+const { readfile, writefile } = require('../../common/node/readfile');
 const stopwatch = require('../../common/node/stopwatch');
-const { Position } = require('../../common/node/utils');
+const { Position, NumberSet } = require('../../common/node/utils');
 
 const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
@@ -11,23 +11,28 @@ readfile(INPUT, (lines) => {
     if (lines.length === 0) stopwatch.timelog('No input to process');
 
     const lagoon = new Lagoon(lines);
-    lagoon.fill();
-
-    const part1total = lagoon.getSize();
+    const part1total = lagoon.getArea();
     stopwatch.timelog(`Part 1: ${part1total}`);
 
     lagoon.fixInstructions();
-    lagoon.fill();
+    const part2total = lagoon.getArea();
 
-    const part2total = lagoon.getSize();
+    lagoon.saveSvg('map.svg', 0.001);
+    lagoon.saveSquaresSvg('mapSquares.svg', 0.001);
+    lagoon.saveDebugInfo('debug.csv');
+
     stopwatch.timelog(`Part 2: ${part2total}`);
 
     stopwatch.stop();
 });
 
 class Lagoon {
-    #instructions = []
-    #rows = [];
+    #instructions = [];
+    #lineSegments = [];
+    #squares = [];
+    #overlaps = [];
+    #horizontalSplits = new NumberSet();
+    #verticalSplits = new NumberSet();
     #width = 0;
     #height = 0;
 
@@ -36,50 +41,54 @@ class Lagoon {
         this.#processInstructions();
     }
 
-    fill() {
-        stopwatch.timelog('Filling lagoon...');
-        let period = stopwatch.startPeriodicLog(5);
+    getArea() {
+        const horizontalLines = this.#horizontalSplits.getNumbers();
+        let totalArea = 0;
+        this.#squares = [];
+        this.#overlaps = [];
 
-        for(let y = 1; y < this.#height - 1; y++) {
-            let wallsCrossed = 0;
-            let wall = 0;
-            let wallUp = 0;
-            let wallDown = 0;
-            const percentDone = (y * 100 / this.#height).toFixed(2);
-            stopwatch.periodicLog(period, `Percent done ${percentDone}$`);
+        const horizontalSegments = [];
+        horizontalLines.forEach((y, index) => {
+            if (index === horizontalLines.length - 1) return;
+            const intersections = this.#findIntersections(y);
+            const nextY = horizontalLines[index + 1];
 
-            for(let x = 0; x < this.#width; x++) {
-                const block = this.#rows[y][x];
-                const blockUp = this.#rows[y-1][x];
-                const blockDown = this.#rows[y+1][x];
+            let intersectionCount = 0;
+            intersections.forEach((x, index) => {
+                if (intersectionCount % 2 == 1) {
+                    const prevX = intersections[index - 1];
+                    const width = x - prevX + 1;
+                    const height = nextY - y + 1;
+                    const area = width * height;
 
-                if (blockUp.block === '#') wallUp++;
-                if (blockDown.block === '#') wallDown++;
-                if (block.block === '#') {
-                    wall++;
-                    continue;
+                    const topSegment = new LineSegment(new Position(y, prevX), new Position(y, x));
+                    const bottomSegment = new LineSegment(new Position(nextY, prevX), new Position(nextY, x));
+
+                    horizontalSegments.push(topSegment, bottomSegment);
+                    const square = {
+                        point1: new Position(y, prevX),
+                        point2: new Position(nextY, x),
+                        area
+                    };
+                    this.#squares.push(square);
+
+                    totalArea += area;
                 }
+                intersectionCount++;
+            });
+        });
 
-                const newWallsCrossed = Math.min(wall, wallUp, wallDown);
-
-                wallsCrossed += newWallsCrossed;
-
-                wall = 0;
-                wallUp = 0;
-                wallDown = 0;
-
-                const inside = wallsCrossed % 2 === 1;
-                if (inside) block.block = '#';
+        // Fix any overlap in horizontal segments that got counted twice
+        let overage = 0;
+        horizontalSegments.forEach((segment1, index) => {
+            for(let i = index + 1; i < horizontalSegments.length; i++) {
+                const segment2 = horizontalSegments[i];
+                const overlap = segment1.getOverlap(segment2, this.#overlaps);
+                overage += overlap;
             }
-        }
-    }
+        });
 
-    getSize() {
-        return this.#rows.reduce((total, row) => {
-            return total + row.reduce((rowTotal, block) => {
-                return rowTotal + (block.block === '#' ? 1 : 0);
-            }, 0);
-        }, 0);
+        return totalArea - overage;
     }
 
     fixInstructions() {
@@ -87,85 +96,139 @@ class Lagoon {
         this.#processInstructions();
     }
 
-    toString() {
-        return '\r\n  ' + this.#rows.reduce((str, row) => {
-            return str + row.reduce((rowStr, block) => {
-                return rowStr + block.block;
-            }, '') + '\r\n  ';
-        }, '');
+    printLineSegments() {
+        const lines = this.#lineSegments.map((line) => line.toString());
+
+        const log = '\r\n' + lines.join('\r\n');
+        stopwatch.timelog(log);
+    }
+
+    saveSvg(fileName, scale) {
+        const width = this.#width * scale;
+        const height = this.#height * scale;
+        const translateY = this.#horizontalSplits.getNumbers().at(0) * -1;
+        const translateX = this.#verticalSplits.getNumbers().at(0) * -1;
+
+        let svg = `<svg version="1.1" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">`;
+
+        const transform = `scale(${scale} ${scale}) translate(${translateX} ${translateY})`;
+        const points = [];
+        points.push(this.#lineSegments[0].getPoint1().toString());
+
+        const endPoints = this.#lineSegments.map((line) => { return line.getPoint2().toString(); });
+        points.push(...endPoints)
+
+        const pointString = points.join(' ');
+
+        svg += `\r\n  <polygon transform="${transform}" points="${pointString}" />`
+        svg += '\r\n</svg>'
+
+        writefile(fileName, svg);
+    }
+
+    saveSquaresSvg(filename, scale) {
+        const width = this.#width * scale;
+        const height = this.#height * scale;
+        const translateY = this.#horizontalSplits.getNumbers().at(0) * -1;
+        const translateX = this.#verticalSplits.getNumbers().at(0) * -1;
+
+        let svg = `<svg version="1.1" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">`;
+
+        const transform = `scale(${scale} ${scale}) translate(${translateX} ${translateY})`;
+
+        const colors = [
+            'black',
+            'blue',
+            'red',
+            'yellow',
+            'grey',
+            'green',
+            'aqua',
+            'burlywood',
+            'coral',
+            'darkolivegreen'
+        ];
+        this.#squares.forEach((square, index) => {
+            const x1 = Math.min(square.point1.getCol(), square.point2.getCol());
+            const y1 = Math.min(square.point1.getRow(), square.point2.getRow());
+            const x2 = Math.max(square.point1.getCol(), square.point2.getCol());
+            const y2 = Math.max(square.point1.getRow(), square.point2.getRow());
+            const width = x2 - x1;
+            const height = y2 - y1;
+            const color = colors[index % colors.length];
+
+            svg += `\r\n  <rect x="${x1}" y="${y1}" width="${width}" height="${height}" fill="${color}" transform="${transform}"/>`
+
+        });
+        svg += '\r\n</svg>'
+
+        writefile(filename, svg);
+    }
+
+    saveDebugInfo(filename) {
+        let csvLines = [];
+
+        csvLines.push('Line Segments');
+        const lineSegments = this.#lineSegments.map((line) => line.toString());
+        csvLines.push(...lineSegments);
+
+        csvLines.push('Squares');
+        const squares = this.#squares.map((square) => {
+            const point1 = square.point1.toString();
+            const point2 = square.point2.toString();
+            return `${point1},${point2},${square.area}`;
+        });
+        csvLines.push(...squares);
+
+        csvLines.push('Overlaps');
+        const overlaps = this.#overlaps.map((overlap) => {
+            return overlap.toString();
+        });
+        csvLines.push(...overlaps);
+        
+        const csvString = csvLines.join('\r\n');
+        writefile(filename, csvString);
     }
 
     #processInstructions() {
-        let pos = this.#buildEmptyGrid();
-        this.#digTrench(pos);
-    }
-
-    #buildEmptyGrid() {
-        stopwatch.timelog('Building initial grid...');
+        stopwatch.timelog('Building line segments...');
         let currentPosition = new Position(0, 0);
-        let minX = 0, maxX = 0, minY = 0, maxY = 0;
+        this.#lineSegments = [];
+        this.#horizontalSplits.clear();
+        this.#verticalSplits.clear();
 
-        stopwatch.timelog('Getting size of grid...');
         this.#instructions.forEach((instruction) => {
+            this.#horizontalSplits.addNumber(currentPosition.getRow());
+            this.#verticalSplits.addNumber(currentPosition.getCol());
 
-            let currentLength = instruction.getLength();
-            while(currentLength > 0) {
-                currentPosition = currentPosition.moveDirection(instruction.getDirection());
-                const row = currentPosition.getRow();
-                const col = currentPosition.getCol();
-                minX = Math.min(minX, col);
-                minY = Math.min(minY, row);
-                maxX = Math.max(maxX, col);
-                maxY = Math.max(maxY, row);
+            let nextPosition = currentPosition.moveDirection(instruction.getDirection(), instruction.getLength());
+            const lineSegment = new LineSegment(currentPosition, nextPosition);
+            this.#lineSegments.push(lineSegment);
 
-                currentLength--;
-            }
+            currentPosition = nextPosition;
         });
 
-        this.#width = maxX - minX + 1;
-        this.#height = maxY - minY + 1;
-        this.#rows = [];
+        const horizontalPoints = this.#horizontalSplits.getNumbers();
+        const verticalPoints = this.#verticalSplits.getNumbers();
+        this.#width = horizontalPoints.at(-1) - horizontalPoints.at(0);
+        this.#height = verticalPoints.at(-1) - verticalPoints.at(0);
 
-        stopwatch.timelog(`Building empty grid (width: ${this.#width}, height: ${this.#height})...`);
-        let period = stopwatch.startPeriodicLog(5);
-
-        for(let y = 0; y < this.#height; y++) {
-            const percentDone = (y * 100 / this.#height).toFixed(2);
-            stopwatch.periodicLog(period, `Percent done: ${percentDone}`);
-
-            const row = [];
-            this.#rows.push(row);
-            for(let x = 0; x < this.#width; x++) {
-                const percentDone = (y * x * 100 / (this.#height * this.#width)).toFixed(2);
-                stopwatch.periodicLog(period, `Percent done: ${percentDone}`);
-
-                row.push({ block: '.' });
-            }
-        }
-
-        return (new Position(minY * -1, minX * -1));
     }
 
-    #digTrench(startingPos) {
-        stopwatch.timelog('Digging trench...');
-        let currentPosition = startingPos;
+    #findIntersections(y) {
+        const intersections = [];
 
-        let period = stopwatch.startPeriodicLog(5);
-        this.#instructions.forEach((instruction, index) => {
-            const percentDone = (index * 100 / this.#instructions.length).toFixed(2);
-            stopwatch.periodicLog(period, `Percent done: ${percentDone}`);
+        this.#lineSegments.forEach((line) => {
+            // We don't care about horizontal lines
+            if (line.isHorizontal()) return;
 
-            let currentLength = instruction.getLength();
-            while(currentLength > 0) {
-                const row = currentPosition.getRow();
-                const col = currentPosition.getCol();
-                this.#rows[row][col].block = '#';
-                this.#rows[row][col].color = instruction.getColor();
-
-                currentPosition = currentPosition.moveDirection(instruction.getDirection());
-                currentLength--;
+            if (line.getMinY() <= y && line.getMaxY() > y) {
+                intersections.push(line.getPoint1().getCol());
             }
         });
+        
+        const sortedIntersections = intersections.sort((a, b) => { return Number(a) - Number(b); });
+        return sortedIntersections;
     }
 }
 
@@ -178,7 +241,7 @@ class Instruction {
         const regex = /(\w) (\d+) \((.*)\)/;
         const matches = regex.exec(line);
         this.#direction = matches[1];
-        this.#length = matches[2];
+        this.#length = Number(matches[2]);
         this.#color = matches[3];
     }
 
@@ -199,5 +262,54 @@ class Instruction {
             case '3': return 'U';
             default: throw `Invalid direction ${num}`;
         }
+    }
+}
+
+class LineSegment {
+    #point1 = null;
+    #point2 = null;
+
+    constructor(point1, point2) {
+        this.#point1 = point1;
+        this.#point2 = point2;
+    }
+
+    getPoint1() { return this.#point1; }
+    getPoint2() { return this.#point2; }
+
+    isHorizontal() { return this.#point1.getRow() === this.#point2.getRow(); }
+    isVertical() { return this.#point1.getCol() === this.#point2.getCol(); }
+
+    getMinY() { return Math.min(this.#point1.getRow(), this.#point2.getRow()); }
+    getMaxY() { return Math.max(this.#point1.getRow(), this.#point2.getRow()); }
+    getMinX() { return Math.min(this.#point1.getCol(), this.#point2.getCol()); }
+    getMaxX() { return Math.max(this.#point1.getCol(), this.#point2.getCol()); }
+
+    getOverlap(lineSegment, overlapList) {
+        if (!lineSegment.isHorizontal() || !this.isHorizontal()) return 0;
+        if (lineSegment.getMinY() !== this.getMinY()) return 0;
+
+        const minXoverlaps = this.getMinX() >= lineSegment.getMinX() && this.getMinX() <= lineSegment.getMaxX();
+        const maxXoverlaps = this.getMaxX() >= lineSegment.getMinX() && this.getMaxX() <= lineSegment.getMaxX();
+
+        if (!minXoverlaps && !maxXoverlaps) return 0;
+
+        const points = [ 
+            this.getMinX(), 
+            lineSegment.getMinX(),
+            this.getMaxX(),
+            lineSegment.getMaxX()
+        ].sort((a, b) => Number(a) - Number(b));
+
+        const overlap = points[2] - points[1] + 1;
+
+        const segment = new LineSegment(new Position(this.getMinY(), points[1]), new Position(this.getMinY(), points[2]));
+        overlapList.push(segment);
+
+        return overlap; 
+    }
+
+    toString() {
+        return `${this.#point1.getCol()}, ${this.#point1.getRow()}, ${this.#point2.getCol()}, ${this.#point2.getRow()}`;
     }
 }

@@ -22,6 +22,10 @@ exports.appendfile = (fileName, string) => {
     fs.writeFileSync(fileName, string, { flag:'a+' });
 }
 
+exports.writefile = (fileName, string) => {
+    fs.writeFileSync(fileName, string);
+}
+
 exports.deletefile = (filename) => {
     fs.unlinkSync(filename);
 }
