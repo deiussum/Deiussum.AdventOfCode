@@ -6,7 +6,7 @@ const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
 const MY_INPUT = 'my-input.txt';
 
-readfile(MY_INPUT, (lines) => {
+readfile(INPUT, (lines) => {
     stopwatch.start();
     if (lines.length === 0) stopwatch.timelog('No input to process');
 
@@ -14,14 +14,14 @@ readfile(MY_INPUT, (lines) => {
     const part1total = lagoon.getArea();
     stopwatch.timelog(`Part 1: ${part1total}`);
 
-    // lagoon.fixInstructions();
-    // const part2total = lagoon.getArea();
+    lagoon.fixInstructions();
+    const part2total = lagoon.getArea();
 
     lagoon.saveSvg('map.svg', 10);
     lagoon.saveSquaresSvg('mapSquares.svg', 10);
     lagoon.saveDebugInfo('debug.csv');
 
-    // stopwatch.timelog(`Part 2: ${part2total}`);
+    stopwatch.timelog(`Part 2: ${part2total}`);
 
     stopwatch.stop();
 });
@@ -289,10 +289,9 @@ class LineSegment {
         if (!lineSegment.isHorizontal() || !this.isHorizontal()) return 0;
         if (lineSegment.getMinY() !== this.getMinY()) return 0;
 
-        const minXoverlaps = this.getMinX() >= lineSegment.getMinX() && this.getMinX() <= lineSegment.getMaxX();
-        const maxXoverlaps = this.getMaxX() >= lineSegment.getMinX() && this.getMaxX() <= lineSegment.getMaxX();
+        const hasOverlap = this.getMinX() <= lineSegment.getMaxX() && this.getMaxX() >= lineSegment.getMinX();
 
-        if (!minXoverlaps && !maxXoverlaps) return 0;
+        if (!hasOverlap) return 0;
 
         const points = [ 
             this.getMinX(), 
