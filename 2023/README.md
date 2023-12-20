@@ -69,18 +69,21 @@ Part 2 was a fairly simple processing of each of the original hashes to arrange 
 
 ## Day 16
 
-This was another fun path tracing pr blem.  For Part 1I started out with a recursive approach, but when I got to my full input, I blew up the call stack.  I modified it to use a stack approach instead and all was good.  I'm scared to see what Part 2 will bring. 
+This was another fun path tracing pr blem.  For Part 1I started out with a recursive approach, but when I got to my full input, I blew up the call stack.  I modified it to use a stack approach instead and all was good.  I'm scared to see what Part 2 will bring.
 Part 2 wasn't as bad as I was expecting.  I just had to shoot the light beam from every edge and find the greatest power.  It was a simple process of looping through the rows/cols and trying from every angle.  I was able to skip any of the inner columns to improve the performance a bit.
 
 ## Day 17
 
-Day 17 broke me.  I've got an implementation that works for the test input, but doesn't work for my full input.  I've seen hints on using Dijkstra's algorithm or an A* algorithm, but I think my brain is burned out and I'm not seeing an easy way to account for the going a maximum of 3 blocks in the same direction.  Will probably come back to this.  For now, I'm throwing in the towel.  
+Day 17 broke me.  I've got an implementation that works for the test input, but doesn't work for my full input.  I've seen hints on using Dijkstra's algorithm or an A-star algorithm, but I think my brain is burned out and I'm not seeing an easy way to account for the going a maximum of 3 blocks in the same direction.  Will probably come back to this.  For now, I'm throwing in the towel.
 Updates to this:  I tried implementing a Dijkstra's/A* algorithm, but I'm clearly not pruning the paths enough yet.  It's taking way too long.  Currently going on almost 19h and it hasn't finished.  I now know what I missed with my previous implementation, so I might try and include some ideas from that to speed it up.  My previous implementation, I worked backwards to build a cache, restricting the size of the area it checked to a square, walking back to the full square.  The reason that didn't provide the right value is that it is possible that to get the shortest path from somewhere in the middle, the path may need to leave that square.
 
 ## Day 18
 
 I completed part 1 of this while waiting on Day 17 to finish.  This was similar to the day 10 part 2.  I just had to find a slightly different way to figure out when walls were crossed.
-Umm... Part 2 is probably going to have to wait.  Checking in the horribly inefficient way of doing it for now, but even on the test input this would take forever to process using my original code.  I'm going to try and get caught up first and revisit this later.  Decided to add in some logging to get an idea how long it would take with the given setup.  Even just building out the initial map would take far too long and would likely end up blowing up my memory. 
+Umm... Part 2 is probably going to have to wait.  Checking in the horribly inefficient way of doing it for now, but even on the test input this would take forever to process using my original code.  I'm going to try and get caught up first and revisit this later.  Decided to add in some logging to get an idea how long it would take with the given setup.  Even just building out the initial map would take far too long and would likely end up blowing up my memory.
 Part 2 update: I figured out how to do this more efficiently and it runs blazing fast.  The problem is, it gives me the right answer for the test data, but it is not correct for my own input!  This is going to be really tough to debug.  My basic strategy was to not try storing each block like I initially did.  Instead, it just stores each line segment.  To calculate the area, I slice everything horizontally to break things into squares.  I then just have to get the area of each square and add it up.  I also just noticed that I'm no longer getting the right answer to part 1.  That might make things a little easier to track down.  I'm dumping a couple of SVGs and a CSV file of debug data so I can visualize what is going on, and it looks like it is going to be a lot of work to figure out what is not being calculated quite right.  That will be a job for another day.  
 Part 2 update 2:  As I was getting ready for bed, I had a though of what the issue might be.  I found a bug in my code that checked for overlap in two line segments.  Fixed that and I got the correct answer.  Yes!
 
+## Day 19
+
+Part 1 was setting up a series of workflows to process parts. It was pretty straightforward and I was glad for the break after struggling on the last couple of days. :)
