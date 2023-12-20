@@ -14,7 +14,7 @@ class Position {
     moveDirection(direction, length) {
         let row = this.#row;
         let col = this.#col;
-        let move = (length === null) ? 1 : length;
+        let move = (!length) ? 1 : length;
 
         switch(direction) {
             case 'N': 
