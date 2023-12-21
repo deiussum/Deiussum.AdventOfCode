@@ -89,3 +89,7 @@ Part 2 update 2:  As I was getting ready for bed, I had a though of what the iss
 Part 1 was setting up a series of workflows to process parts. It was pretty straightforward and I was glad for the break after struggling on the last couple of days. :)
 Part 2 wasn't too bad.  It involved setting up a list of possible paths and what the min/max ranges were to get to the end of each path that had an accepted part.  It was then just simple math to calculate the total possible combinations for each path and add them all together.
 
+## Day 20
+
+Part 1 was a bit tricky to understand.  It appeared to be some sort of decision tree, but they way it was explained took a bit to understand all of the exact rules of how the pulses were supposed to be processed.  Once I got that figured out the implementation wasn't too bad.
+
