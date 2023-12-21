@@ -87,3 +87,5 @@ Part 2 update 2:  As I was getting ready for bed, I had a though of what the iss
 ## Day 19
 
 Part 1 was setting up a series of workflows to process parts. It was pretty straightforward and I was glad for the break after struggling on the last couple of days. :)
+Part 2 wasn't too bad.  It involved setting up a list of possible paths and what the min/max ranges were to get to the end of each path that had an accepted part.  It was then just simple math to calculate the total possible combinations for each path and add them all together.
+
