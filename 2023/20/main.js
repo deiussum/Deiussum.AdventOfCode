@@ -10,8 +10,13 @@ readfile.readfile(INPUT, (lines) => {
 
     const machine = new Machine(lines);
     const results = machine.run(1000);
-
     stopwatch.timelog(`Part 1 results: ${results}`);
+
+    machine.reset();
+    machine.addFinalModule('rx');
+    const cycleCount = machine.runUntilOn();
+    stopwatch.timelog(`Part 2 results: ${cycleCount}`);
+
 
     stopwatch.stop();
 });
@@ -40,6 +45,10 @@ class Module {
         }
 
         if (parts[2].trim() === '') return;
+        if (parts[2].trim() === 'final') { 
+            this.#type = 'final';
+            return;
+        }
 
         const destinations = parts[2].split(', ');
         this.#destinations = destinations.map((dest) => {
@@ -50,6 +59,7 @@ class Module {
     getName() { return this.#name; }
     getType() { return this.#type; }
     getDestinations() { return [...this.#destinations]; }
+    isOn() { return this.#isOn; }
 
     connect(inputName) {
         this.#inputs[inputName] = 'low';
@@ -69,11 +79,22 @@ class Module {
             case '&': 
                 this.#receiveConjunction(pulse);
                 break;
+            case 'final':
+                this.#isOn = this.#isOn || pulse === 'low';
+                break;
         }
     }
 
     emit() {
         return this.#pendingEmits.shift();
+    }
+
+    reset() {
+        this.#isOn = false;
+        this.#pendingEmits = [];
+        for(let key in this.#inputs) {
+            this.#inputs[key] = 'low';
+        }
     }
 
     #receiveFlipFlop(pulse) {
@@ -129,6 +150,32 @@ class Machine {
         return this.#highPulseCount * this.#lowPulseCount;
     }
 
+    reset() {
+        this.#highPulseCount = 0;
+        this.#lowPulseCount = 0;
+        this.#modules.forEach((module) => module.reset());
+    }
+
+    addFinalModule(name) {
+        const finalModule = new Module(`${name} -> final`);
+        this.#modules.push(finalModule);
+    }
+
+    runUntilOn() {
+        let cycleCount = 0;
+        const finalModule = this.#getFinalModule();
+
+        // NOTE: cycleCount > 1,000,000,000,000, but less than 250,000,000,000,000
+        const period = stopwatch.startPeriodicLog(5);
+        while(!finalModule.isOn()) {
+            stopwatch.periodicLog(period, `Current cycle: ${cycleCount.toLocaleString()}`);
+            this.#runCycle();
+            cycleCount++;
+        }
+
+        return cycleCount;
+    }
+
     #connectModules() {
         this.#modules.forEach((module) => {
             const destinations = module.getDestinations().map((dest) => {
@@ -173,5 +220,10 @@ class Machine {
         if (foundModule) return foundModule;
 
         return new Module(`${name} -> `);
+    }
+
+    #getFinalModule(name) {
+        const foundModule = this.#modules.find((module) => module.getType() === 'final');
+        return foundModule;
     }
 }
