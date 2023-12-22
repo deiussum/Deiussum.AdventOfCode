@@ -11,6 +11,14 @@ class Position {
     getRow() { return this.#row; }
     getCol() { return this.#col; }
 
+    equals(pos) {
+        return this.#row === pos.getRow() && this.#col === pos.getCol();
+    }
+
+    distance(pos) {
+        return Math.abs(pos.getRow() - this.#row) + Math.abs(pos.getCol() - this.#col);
+    }
+
     moveDirection(direction, length) {
         let row = this.#row;
         let col = this.#col;

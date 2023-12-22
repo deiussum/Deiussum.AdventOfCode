@@ -93,3 +93,7 @@ Part 2 wasn't too bad.  It involved setting up a list of possible paths and what
 
 Part 1 was a bit tricky to understand.  It appeared to be some sort of decision tree, but they way it was explained took a bit to understand all of the exact rules of how the pulses were supposed to be processed.  Once I got that figured out the implementation wasn't too bad.
 Part 2 isn't too bad to change the code for using a brute-force method.  However, I'm guessing I will need to run over a trillion cycles, so that probably isn't very efficient.  I'll let it run a bit while I get an idea of how I can optimize this thing...  I may move on to day 21 in the meantime to try and get a bit more caught up.
+
+## Day 21
+
+Part 1 revisits a path finding algorithm.  I thought it was going to be simpler, but it took me a bit to finally get a solution that wasn't going to take days to complete.  I'm scared to look at what part 2 will bring....
