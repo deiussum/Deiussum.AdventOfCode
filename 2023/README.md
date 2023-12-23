@@ -101,3 +101,4 @@ Part 2 expands the map to a repeating, infinite size and changes the step count 
 
 ## Day 22
 Part 1 was a fun one.  It involved positioning bricks in a 3d space, letting them all drop and then determining which ones could be removed.  It was fairly straightforward.
+The tricky part of Part 2 is that a single brick might be the sole support for multipe bricks, so you need to keep track of all of the bricks that are falling to see if all of the support bricks of a particular brick are falling.  My algorithm works fine currently for the test data, but isn't quite right for the full input yet.  I may come back to this later to try and get a start on Day 23.

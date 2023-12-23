@@ -110,6 +110,10 @@ class NumberSet {
         }
     }
 
+    addRange(numbers) {
+        numbers.forEach((number) => this.addNumber(number));
+    }
+
     hasNumber(number) {
         return this.#numbers.indexOf(number) >= 0;
     }

@@ -1,6 +1,6 @@
 const readfile = require('../../common/node/readfile');
 const stopwatch = require('../../common/node/stopwatch');
-const { Position3d } = require('../../common/node/utils');
+const { Position3d, NumberSet } = require('../../common/node/utils');
 
 const TEST_INPUT = 'input-test.txt';
 const INPUT = 'input.txt';
@@ -13,15 +13,19 @@ readfile.readfile(INPUT, (lines) => {
     const part1Total = brickCollection.getBricksSafeToDisintegrate();
     stopwatch.timelog(`Part 1 total: ${part1Total}`);
 
+    const part2Total = brickCollection.getFallingBrickCount();
+    stopwatch.timelog(`Part 2 total: ${part2Total}`); // NOTE: 13112 is too low, 2324298 is too high...
 
     stopwatch.stop();
 });
-
 
 class Brick {
     #id = null;
     #corner1 = null;
     #corner2 = null;
+    #supportsThisBrick = [];
+    #thisBrickSupports = [];
+    #totalSupportCache = null;
 
     constructor(line, id) {
         const regex = /^(\d+),(\d+),(\d+)~(\d+),(\d+),(\d+)$/
@@ -35,6 +39,8 @@ class Brick {
         this.#corner2 = new Position3d(matches[4], matches[5], matches[6]);
         this.#id = id;
     }
+
+    getId() { return this.#id; }
 
     getBottom() {
         return Math.min(this.#corner1.getZ(), this.#corner2.getZ());
@@ -72,6 +78,43 @@ class Brick {
         this.#corner1.translate(0, 0, steps * -1);
         this.#corner2.translate(0, 0, steps * -1);
     }
+
+    addSupportsThisBrick(bricks) {
+        this.#supportsThisBrick.push(...bricks);
+    }
+
+    getBricksSupportingThis() {
+        return [ ...this.#supportsThisBrick ];
+    }
+
+    addThisBrickSupports(bricks) {
+        this.#thisBrickSupports.push(...bricks);
+    }
+
+    getBricksThisSupports() {
+        return [ ...this.#thisBrickSupports ];
+    }
+
+    getBricksToFallIfDestroyed(fallingBricks) {
+        if (this.#totalSupportCache) return this.#totalSupportCache;
+
+        this.#totalSupportCache = [];
+
+        this.#thisBrickSupports.forEach((brick) => {
+            const areAllSupportsFalling = brick.getBricksSupportingThis().every((supportBrick) => {
+                return fallingBricks.hasNumber(supportBrick.getId());
+            });
+
+            if (!areAllSupportsFalling) return;
+            this.#totalSupportCache.push(brick.getId());
+
+            fallingBricks.addNumber(brick.getId());
+            const chainBrickIds = brick.getBricksToFallIfDestroyed(fallingBricks);
+            this.#totalSupportCache.push(...chainBrickIds);
+        });
+
+        return this.#totalSupportCache;
+    }
 }
 
 class BrickCollection {
@@ -81,11 +124,13 @@ class BrickCollection {
         this.#bricks = lines.map((line, index) => new Brick(line, index));
 
         this.#bricks = this.#bricks.sort((a, b) => a.getBottom() - b.getBottom());
+
+        this.#settleBlocks();
+        this.#linkBricks();
     }
 
     getBricksSafeToDisintegrate() {
         let total = 0;
-        this.#settleBlocks();
 
         this.#bricks.forEach((brick) => {
             if (this.#canDisintigrateBrick(brick)) {
@@ -93,6 +138,21 @@ class BrickCollection {
             }
         });
 
+        return total;
+    }
+
+    getFallingBrickCount() {
+        const bricks = this.#bricks.sort((a, b) => a.getTop() - b.getTop());
+        let total = 0;
+        while(bricks.length > 0) {
+            const nextBrick = bricks.pop();
+
+            if (this.#canDisintigrateBrick(nextBrick)) continue;
+
+            const fallingBricks = new NumberSet();
+            fallingBricks.addNumber(nextBrick.getId());
+            total += nextBrick.getBricksToFallIfDestroyed(fallingBricks).length;
+        }
         return total;
     }
 
@@ -130,11 +190,11 @@ class BrickCollection {
     }
 
     #canDisintigrateBrick(brick) {
-        const bricksThisIsSupporting = this.#getBricksThisIsSupporting(brick);
+        const bricksThisIsSupporting = brick.getBricksThisSupports(brick);
         if (bricksThisIsSupporting.length === 0) return true;
 
         const canRemove = bricksThisIsSupporting.every((supportsBrick) => {
-            const supportBricks = this.#getBricksSupportingThis(supportsBrick);
+            const supportBricks = supportsBrick.getBricksSupportingThis();
             return supportBricks.length > 1;
         });
 
@@ -151,5 +211,12 @@ class BrickCollection {
         const corner1 = new Position3d(brick.getWEdge(), brick.getNEdge(), brick.getBottom() - 1);
         const corner2 = new Position3d(brick.getEEdge(), brick.getSEdge(), brick.getBottom() - 1);
         return this.#findBlocksInArea(corner1, corner2);
+    }
+
+    #linkBricks() {
+        this.#bricks.forEach((brick) => {
+            brick.addThisBrickSupports(this.#getBricksThisIsSupporting(brick));
+            brick.addSupportsThisBrick(this.#getBricksSupportingThis(brick));
+        });
     }
 }
