@@ -98,3 +98,6 @@ Part 2 isn't too bad to change the code for using a brute-force method.  However
 
 Part 1 revisits a path finding algorithm.  I thought it was going to be simpler, but it took me a bit to finally get a solution that wasn't going to take days to complete.  I'm scared to look at what part 2 will bring....
 Part 2 expands the map to a repeating, infinite size and changes the step count to 26,501,365.  I've implemented a brute fore method, but expect that would take weeks to complete.  I suspect the data is setup in a way that you reach the center of each map on the side all in the same number of steps, which means I can use that to calculate how many map sections it will complete to get closer to the final step count.  I'll probably move on for now and come back to this one later.
+
+## Day 22
+Part 1 was a fun one.  It involved positioning bricks in a 3d space, letting them all drop and then determining which ones could be removed.  It was fairly straightforward.

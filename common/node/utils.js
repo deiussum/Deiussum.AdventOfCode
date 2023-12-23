@@ -54,6 +54,33 @@ class Position {
 
 exports.Position = Position;
 
+class Position3d {
+    #x = 0;
+    #y = 0;
+    #z = 0;
+
+    constructor(x, y, z) {
+        this.#x = Number(x);
+        this.#y = Number(y);
+        this.#z = Number(z);
+    }
+
+    getX() { return this.#x; }
+    getY() { return this.#y; }
+    getZ() { return this.#z; }
+
+    translate(x, y, z) {
+        this.#x += x;
+        this.#y += y;
+        this.#z += z;
+    }
+
+    toString() {
+        return `${this.#x},${this.#y},${this.#z}`;
+    }
+}
+exports.Position3d = Position3d;
+
 class Cache {
     #cache = [];
 
