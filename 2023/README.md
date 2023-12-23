@@ -102,3 +102,7 @@ Part 2 expands the map to a repeating, infinite size and changes the step count 
 ## Day 22
 Part 1 was a fun one.  It involved positioning bricks in a 3d space, letting them all drop and then determining which ones could be removed.  It was fairly straightforward.
 The tricky part of Part 2 is that a single brick might be the sole support for multipe bricks, so you need to keep track of all of the bricks that are falling to see if all of the support bricks of a particular brick are falling.  My algorithm works fine currently for the test data, but isn't quite right for the full input yet.  I may come back to this later to try and get a start on Day 23.
+
+## Day 23
+
+Part 1 was another path finding challenge.  Because of my poor experience with the past pathfinding challenges, I was prepared to pass on this one for another day.  I managed to get something working without too much difficulty, though.  It took about 8s to complete, though, so I am guessing that is not going to be a good enough algorithm for whatever Part 2 is going to throw at me.
