@@ -14,6 +14,10 @@ readfile.readfile(INPUT, (lines) => {
     const part1total = map.plotsReachedAfter(64);
     stopwatch.timelog(`Part 1 total: ${part1total}`);
 
+    map.expandMap();
+    const part2Total = map.plotsReachedAfter(26501365);
+    stopwatch.timelog(`Part 2 total: ${part2Total}`);
+    
     stopwatch.stop();
 });
 
@@ -24,6 +28,7 @@ class Map {
     #startPosition = null;
     #finalPositions = [];
     #visited = [];
+    #expanded = false;
 
     constructor(lines) {
         this.#rows.push(...lines);
@@ -32,11 +37,11 @@ class Map {
         this.#findStartPosition();
     }
 
-    // 3653 is too high
     plotsReachedAfter(steps) {
         let stepQueue = [];
         const isOddSteps = steps % 2 === 1;
         this.#finalPositions = [];
+        this.#visited = [];
         const period = stopwatch.startPeriodicLog(5);
 
         let nextPathId = 0;
@@ -84,11 +89,38 @@ class Map {
     }
 
     isValidPosition(position) {
-        if (position.getRow() < 0 || position.getRow() >= this.#height) return false;
-        if (position.getCol() < 0 || position.getCol() >= this.#width) return false;
-        if (this.#rows[position.getRow()][position.getCol()] === '#') return false;
+        if (!this.#expanded && (position.getRow() < 0 || position.getRow() >= this.#height)) return false;
+        if (!this.#expanded && (position.getCol() < 0 || position.getCol() >= this.#width)) return false;
+        if (this.getBlock(position) === '#') return false;
 
         return true;
+    }
+
+    expandMap() { 
+        this.#expanded = true; 
+    }
+
+    getBlock(pos) {
+        let row = pos.getRow();
+        let col = pos.getCol();
+
+        if (this.#expanded && row >= this.#height) {
+            row = row % this.#height;
+        }
+
+        if (this.#expanded && row < 0) {
+            row = this.#height + (row % this.#height);
+        }
+
+        if (this.#expanded && col >= this.#width) {
+            col = col % this.#width;
+        }
+
+        if (this.#expanded && col < 0) {
+            col = this.#width + (col % this.#width);
+        }
+
+        return this.#rows[row][col];
     }
 
     #isShortestVisit(pos, distance) {
