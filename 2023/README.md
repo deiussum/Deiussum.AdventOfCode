@@ -107,3 +107,7 @@ The tricky part of Part 2 is that a single brick might be the sole support for m
 
 Part 1 was another path finding challenge.  Because of my poor experience with the past pathfinding challenges, I was prepared to pass on this one for another day.  I managed to get something working without too much difficulty, though.  It took about 8s to complete, though, so I am guessing that is not going to be a good enough algorithm for whatever Part 2 is going to throw at me.
 I tried to brute force Part 2, but as I expected, it is taking way too long to complete so I'll need to find a better algorithm.  I am letting it run a bit while I move on to the next challenge.
+
+## Day 24
+
+Part 1 let me use some good old high school geometry to calculate the intersection of lines.  
