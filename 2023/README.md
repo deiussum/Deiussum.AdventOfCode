@@ -111,3 +111,8 @@ I tried to brute force Part 2, but as I expected, it is taking way too long to c
 ## Day 24
 
 Part 1 let me use some good old high school geometry to calculate the intersection of lines.  
+Oh fun, we get to do some 3d geometry now and find a line that intersects all other lines, plus a point on that line and velocity that would cause it to hit every hailstone.  I think I'll move on and come back to this one. :)
+
+## Day 25
+
+Final challenge!  Looks like for Part 1 I'll need to build a graph and try to figure out how to divide that into 2 separate groups by only disconnecting 3 nodes.
