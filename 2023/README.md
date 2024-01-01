@@ -115,4 +115,4 @@ Oh fun, we get to do some 3d geometry now and find a line that intersects all ot
 
 ## Day 25
 
-Final challenge!  Looks like for Part 1 I'll need to build a graph and try to figure out how to divide that into 2 separate groups by only disconnecting 3 nodes.
+Final challenge!  Looks like for Part 1 I'll need to build a graph and try to figure out how to divide that into 2 separate groups by only disconnecting 3 nodes.  I wasn't able to work on this much until later, but I've got a brute force method in place that works fine for the test input, but is not feasible for the full input.  I've got no ideas on how to make this better so I will probably to come back to this after I've gone back and completed the other challenges.
