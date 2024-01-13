@@ -64,8 +64,7 @@ class City {
         var found = false;
         let maxHeat = 0;
         let minDistance = this.#width + this.#height;
-        const startTime = new Date();
-        let loggedSecond = 0;
+        const period = stopwatch.startPeriodicLog(5);
         while(!found && pathQueue.getLength() > 0) {
             const path = pathQueue.shift();
             const block = this.getBlock(path.getCurrentPosition());
@@ -75,11 +74,8 @@ class City {
             minDistance = Math.min(minDistance, path.getDistanceToEnd());
 
             // Log progress every 5 seconds
-            const elapsedSeconds = Math.floor((new Date() - startTime) / 1000);
-            if (elapsedSeconds % 5 === 0 && elapsedSeconds !== loggedSecond) {
-                loggedSecond = elapsedSeconds;
-                stopwatch.timelog(`Queue : ${pathQueue.getLength()} - Heat: ${maxHeat} - Remaining Distance: ${minDistance}`);
-            }
+            stopwatch.periodicLog(period, `Queue : ${pathQueue.getLength()} - Heat: ${maxHeat} - Remaining Distance: ${minDistance}`);
+
             const newPaths = path.split();
             newPaths.forEach((newPath) => {
                 const newHeat = newPath.getHeat();
